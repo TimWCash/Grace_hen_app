@@ -1,26 +1,138 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* ───────────────────────────────────────────────────────────────
+     RL Black Label palette
+     ─────────────────────────────────────────────────────────────── */
+  --color-chalk: #f5f5f5;
+  --color-chalk-deep: #ebebeb;
+  --color-navy: #002344;
+  --color-navy-deep: #001428;
+  --color-gold: #c5a059;
+  --color-gold-soft: #d4b676;
+  --color-ink: #002344;          /* alias: text/icons share navy */
+  --color-paper: #f5f5f5;        /* alias: background = chalk */
+  --color-paper-warm: #ebebeb;   /* alias for subtle elevation */
+
+  --color-rule: rgba(0, 35, 68, 0.18);
+  --color-rule-soft: rgba(0, 35, 68, 0.08);
+  --color-rule-gold: rgba(197, 160, 89, 0.6);
+
+  /* shadcn-style aliases so dropped-in components inherit the palette */
+  --color-background: var(--color-paper);
+  --color-foreground: var(--color-navy);
+  --color-card: var(--color-paper);
+  --color-card-foreground: var(--color-navy);
+  --color-popover: var(--color-paper);
+  --color-popover-foreground: var(--color-navy);
+  --color-primary: var(--color-navy);
+  --color-primary-foreground: var(--color-paper);
+  --color-secondary: var(--color-paper-warm);
+  --color-secondary-foreground: var(--color-navy);
+  --color-muted: var(--color-paper-warm);
+  --color-muted-foreground: rgba(0, 35, 68, 0.55);
+  --color-accent: rgba(197, 160, 89, 0.12);
+  --color-accent-foreground: var(--color-navy);
+  --color-destructive: #7a1f23;
+  --color-destructive-foreground: var(--color-paper);
+  --color-border: var(--color-rule);
+  --color-input: var(--color-rule);
+  --color-ring: var(--color-gold);
+
+  /* Legacy aliases used by older custom code */
+  --color-cream: var(--color-paper);
+  --color-ivory: var(--color-paper-warm);
+  --color-bone: var(--color-paper-warm);
+  --color-oxblood: #7a1f23;
+
+  --font-display: var(--font-playfair);
+  --font-body: var(--font-inter);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --background: var(--color-paper);
+  --foreground: var(--color-navy);
+}
+
+/* ─── HARD RESET: NO ROUNDED, NO SHADOWS ──────────────────────────── */
+* {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+html,
+body {
+  background: var(--color-paper);
+  color: var(--color-navy);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), "Inter", "Montserrat", system-ui, sans-serif;
+  font-feature-settings: "ss01";
+  letter-spacing: 0.05em;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6,
+.font-display {
+  font-family: var(--font-playfair), "Playfair Display", "Times New Roman", serif;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+}
+
+/* ─── TYPOGRAPHY UTILITIES (RL Black Label conventions) ───────────── */
+
+/* Nav / buttons / labels — uppercase sans 0.1em tracking per spec */
+.label {
+  font-family: var(--font-inter), "Inter", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 500;
+}
+
+/* Smaller eyebrow variant — uppercase sans, wider tracking */
+.tracking-eyebrow {
+  letter-spacing: 0.4em;
+}
+
+.tracking-wide-rl {
+  letter-spacing: 0.3em;
+}
+
+/* Monospace timestamps (Field Notes) */
+.mono {
+  font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  font-feature-settings: "tnum";
+  letter-spacing: 0;
+}
+
+/* ─── RULES (hairlines) ───────────────────────────────────────────── */
+.rule {
+  height: 0.5px;
+  background: var(--color-rule);
+}
+.rule-gold {
+  height: 0.5px;
+  background: var(--color-rule-gold);
+}
+
+::selection {
+  background: var(--color-navy);
+  color: var(--color-paper);
+}
+
+/* ─── MAP TILE TINT — neutral for Black Label ─────────────────────── */
+.parchment-map .maplibregl-canvas {
+  filter: saturate(0.6) brightness(0.96) contrast(1.05);
+}
+.parchment-map .maplibregl-ctrl-attrib {
+  background: rgba(245, 245, 245, 0.9) !important;
+  font-family: var(--font-inter);
+  font-size: 9px;
+  letter-spacing: 0.02em;
+}
+.parchment-map .maplibregl-ctrl-attrib a {
+  color: var(--color-navy);
+  opacity: 0.5;
 }

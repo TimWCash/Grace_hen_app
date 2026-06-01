@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <rect width="120" height="120" rx="24" fill="#0a1f44"/>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d6bf86"/>
+      <stop offset="100%" stop-color="#b89b5e"/>
+    </linearGradient>
+  </defs>
+  <path d="M60 14 L100 28 L100 66 C100 88 82 106 60 116 C38 106 20 88 20 66 L20 28 Z"
+        fill="none" stroke="url(#g)" stroke-width="2"/>
+  <text x="60" y="56" text-anchor="middle"
+        font-family="Georgia, 'Cormorant Garamond', serif"
+        font-size="32" font-style="italic" fill="#f5efe0">G</text>
+  <text x="60" y="76" text-anchor="middle"
+        font-family="Georgia, 'Cormorant Garamond', serif"
+        font-size="16" font-style="italic" fill="url(#g)">&amp;</text>
+  <text x="60" y="98" text-anchor="middle"
+        font-family="Georgia, 'Cormorant Garamond', serif"
+        font-size="32" font-style="italic" fill="#f5efe0">M</text>
+</svg>
