@@ -68,11 +68,6 @@ export const EVENT = {
     description: "Private invitation. Dublin, 27 June 2026.",
   },
 
-  /** Concierge passcode — currently a duplicate of the Supabase value for
-   * client-side display hints. The authoritative check still happens
-   * server-side via verify_passcode(). */
-  passcodeHint: "BrideSquad2026",
-
   /** Essentials — logistics shown on /essentials. TK fields await Tim. */
   essentials: {
     dressCode: "Dress in black. Sleek and bold.",

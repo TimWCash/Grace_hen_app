@@ -9,7 +9,7 @@ export default function GuestsPage() {
       sectionMark="VII"
       eyebrow="The Hens · Roll Call"
       title="The Guests"
-      subtitle="Twelve women, one bride. In order of arrival."
+      subtitle="The hens, in order of arrival."
     >
       <ol className="space-y-0 mt-2">
         {HENS.map((hen, i) => (

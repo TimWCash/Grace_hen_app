@@ -1,33 +1,21 @@
 import type { MetadataRoute } from "next";
+import { EVENT } from "@/config/event";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Grace's Hen — Dublin",
-    short_name: "Grace's Hen",
-    description:
-      "A keepsake companion for Grace's hen weekend and wedding day.",
+    name: EVENT.app.title,
+    short_name: EVENT.app.shortName,
+    description: EVENT.app.description,
     start_url: "/",
     display: "standalone",
-    background_color: "#fbf8ef",
-    theme_color: "#0a1f44",
+    background_color: EVENT.brand.colors.background,
+    theme_color: EVENT.brand.colors.text,
     orientation: "portrait",
     icons: [
       {
-        src: "/icon.svg",
+        src: EVENT.brand.icon,
         sizes: "any",
         type: "image/svg+xml",
-        purpose: "any",
-      },
-      {
-        src: "/icon-192.png",
-        sizes: "192x192",
-        type: "image/png",
-        purpose: "maskable",
-      },
-      {
-        src: "/icon-512.png",
-        sizes: "512x512",
-        type: "image/png",
         purpose: "any",
       },
     ],

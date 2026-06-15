@@ -10,13 +10,16 @@ type QuizAnswer = {
   question_id: string;
   guest_id: string;
   chosen_index: number;
-  is_correct: boolean;
+  is_correct: boolean | null; // null = checking
 };
 type Task = { id: string; position: number; task: string };
 type Completion = { task_id: string; guest_id: string };
+type LeaderRow = { guest_id: string; display_name: string; score: number; answered: number };
+
+type Tab = "quiz" | "hunt" | "board";
 
 export default function GamesPage() {
-  const [tab, setTab] = useState<"quiz" | "hunt">("quiz");
+  const [tab, setTab] = useState<Tab>("quiz");
   const [guestId, setGuestId] = useState<string | null>(null);
 
   const [questions, setQuestions] = useState<QuizQ[] | null>(null);
@@ -24,6 +27,8 @@ export default function GamesPage() {
 
   const [tasks, setTasks] = useState<Task[] | null>(null);
   const [completions, setCompletions] = useState<Set<string>>(new Set());
+
+  const [board, setBoard] = useState<LeaderRow[] | null>(null);
 
   useEffect(() => {
     const sb = supabase();
@@ -45,13 +50,10 @@ export default function GamesPage() {
       if (qRes.data) setQuestions(qRes.data as QuizQ[]);
       if (aRes.data)
         setMyAnswers(
-          Object.fromEntries(
-            (aRes.data as QuizAnswer[]).map((a) => [a.question_id, a]),
-          ),
+          Object.fromEntries((aRes.data as QuizAnswer[]).map((a) => [a.question_id, a])),
         );
       if (tRes.data) setTasks(tRes.data as Task[]);
-      if (cRes.data)
-        setCompletions(new Set((cRes.data as Completion[]).map((c) => c.task_id)));
+      if (cRes.data) setCompletions(new Set((cRes.data as Completion[]).map((c) => c.task_id)));
     };
     load();
     return () => {
@@ -59,35 +61,38 @@ export default function GamesPage() {
     };
   }, []);
 
+  // Lazy-load the leaderboard when its tab opens.
+  useEffect(() => {
+    if (tab !== "board" || board !== null) return;
+    const sb = supabase();
+    let cancelled = false;
+    sb.rpc("quiz_leaderboard").then(({ data, error }) => {
+      if (cancelled) return;
+      setBoard(error ? [] : (data as LeaderRow[]));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [tab, board]);
+
   const answer = async (qId: string, idx: number) => {
     if (!guestId) return;
     const sb = supabase();
+    // Pending: show the pick but no verdict yet (avoids a false "not quite" flash).
     setMyAnswers((prev) => ({
       ...prev,
-      [qId]: {
-        question_id: qId,
-        guest_id: guestId,
-        chosen_index: idx,
-        is_correct: false,
-      },
+      [qId]: { question_id: qId, guest_id: guestId, chosen_index: idx, is_correct: null },
     }));
-    const { data, error } = await sb.rpc("check_quiz_answer", {
-      q: qId,
-      chosen: idx,
-    });
+    const { data, error } = await sb.rpc("check_quiz_answer", { q: qId, chosen: idx });
     if (error) {
       console.error(error);
       return;
     }
     setMyAnswers((prev) => ({
       ...prev,
-      [qId]: {
-        question_id: qId,
-        guest_id: guestId,
-        chosen_index: idx,
-        is_correct: !!data,
-      },
+      [qId]: { question_id: qId, guest_id: guestId, chosen_index: idx, is_correct: !!data },
     }));
+    setBoard(null); // invalidate cached leaderboard
   };
 
   const toggleTask = async (taskId: string) => {
@@ -101,58 +106,53 @@ export default function GamesPage() {
       return next;
     });
     if (isDone) {
-      await sb
-        .from("scavenger_completions")
-        .delete()
-        .eq("task_id", taskId)
-        .eq("guest_id", guestId);
+      await sb.from("scavenger_completions").delete().eq("task_id", taskId).eq("guest_id", guestId);
     } else {
-      await sb
-        .from("scavenger_completions")
-        .upsert({ task_id: taskId, guest_id: guestId });
+      await sb.from("scavenger_completions").upsert({ task_id: taskId, guest_id: guestId });
     }
   };
 
-  const answered = questions
-    ? questions.filter((q) => myAnswers[q.id] !== undefined)
-    : [];
-  const score = answered.filter((q) => myAnswers[q.id]?.is_correct).length;
+  const score = questions
+    ? questions.filter((q) => myAnswers[q.id]?.is_correct === true).length
+    : 0;
+
+  const TABS: { key: Tab; label: string }[] = [
+    { key: "quiz", label: "Mr & Mrs" },
+    { key: "hunt", label: "Scavenger" },
+    { key: "board", label: "Standings" },
+  ];
 
   return (
     <PageFrame
+      sectionMark="V"
       eyebrow="The Parlour Games"
-      title="Mr & Mrs"
-      subtitle="how well do you really know her?"
+      title="The Salon"
+      subtitle="How well do you really know her?"
     >
-      <div className="flex gap-2 mb-6">
-        {(["quiz", "hunt"] as const).map((t) => (
+      <div className="grid grid-cols-3 gap-0 border-y mb-8" style={{ borderColor: "var(--color-rule)" }}>
+        {TABS.map((t, i) => (
           <button
-            key={t}
+            key={t.key}
             type="button"
-            onClick={() => setTab(t)}
-            className="flex-1 rounded-lg border py-2 font-display text-sm tracking-wider transition-all"
+            onClick={() => setTab(t.key)}
+            className={`label text-[9px] py-3.5 ${i > 0 ? "border-l" : ""}`}
             style={{
-              background: tab === t ? "var(--color-navy)" : "rgba(255,255,255,0.6)",
-              color: tab === t ? "var(--color-cream)" : "var(--color-navy)",
               borderColor: "var(--color-rule)",
+              background: tab === t.key ? "var(--color-navy)" : "transparent",
+              color: tab === t.key ? "var(--color-paper)" : "var(--color-navy)",
+              minHeight: "48px",
             }}
           >
-            {t === "quiz" ? "Mr & Mrs" : "Scavenger"}
+            {t.label}
           </button>
         ))}
       </div>
 
-      {tab === "quiz" ? (
-        <QuizTab
-          questions={questions}
-          myAnswers={myAnswers}
-          score={score}
-          total={questions?.length ?? 0}
-          onAnswer={answer}
-        />
-      ) : (
-        <HuntTab tasks={tasks} done={completions} onToggle={toggleTask} />
+      {tab === "quiz" && (
+        <QuizTab questions={questions} myAnswers={myAnswers} score={score} total={questions?.length ?? 0} onAnswer={answer} />
       )}
+      {tab === "hunt" && <HuntTab tasks={tasks} done={completions} onToggle={toggleTask} />}
+      {tab === "board" && <BoardTab board={board} meId={guestId} />}
     </PageFrame>
   );
 }
@@ -173,106 +173,84 @@ function QuizTab({
   return (
     <>
       <div
-        className="rounded-xl border p-4 mb-4 flex items-center justify-between"
-        style={{
-          background: "var(--color-ivory)",
-          borderColor: "var(--color-rule)",
-        }}
+        className="border p-4 mb-6 flex items-baseline justify-between"
+        style={{ borderColor: "var(--color-rule)" }}
       >
-        <div>
-          <div
-            className="text-[10px] uppercase tracking-[0.3em]"
-            style={{ color: "var(--color-gold)" }}
-          >
-            Mark's answers · pre-filled
-          </div>
-          <div
-            className="font-display text-lg"
-            style={{ color: "var(--color-navy)" }}
-          >
-            Your score: {score} / {total}
-          </div>
-        </div>
-        <div
-          className="font-display text-3xl"
-          style={{ color: "var(--color-oxblood)" }}
-        >
-          ♛
-        </div>
+        <span className="label text-[9px]" style={{ color: "var(--color-gold)" }}>
+          Mark&apos;s answers · pre-filled
+        </span>
+        <span className="font-display" style={{ color: "var(--color-navy)", fontSize: "20px" }}>
+          {score} / {total}
+        </span>
       </div>
 
       {!questions ? (
-        <SkeletonList n={3} h="h-40" />
+        <SkeletonList n={3} h="h-36" />
       ) : (
-        <ol className="space-y-4">
+        <ol className="space-y-8">
           {questions.map((q, i) => {
             const mine = myAnswers[q.id];
             return (
-              <li
-                key={q.id}
-                className="rounded-xl border p-4"
-                style={{
-                  background: "rgba(255, 255, 255, 0.7)",
-                  borderColor: "var(--color-rule)",
-                }}
-              >
-                <div className="flex items-baseline gap-2 mb-3">
+              <li key={q.id}>
+                <div className="flex items-baseline gap-2.5">
                   <span
-                    className="font-display italic text-sm"
-                    style={{ color: "var(--color-gold)" }}
+                    className="font-display italic tabular-nums shrink-0"
+                    style={{ color: "var(--color-gold)", fontSize: "13px" }}
                   >
-                    №{String(i + 1).padStart(2, "0")}
+                    {String(i + 1).padStart(2, "0")}
                   </span>
                   <span
-                    className="font-display text-base leading-snug"
-                    style={{ color: "var(--color-navy)" }}
+                    className="font-display"
+                    style={{ color: "var(--color-navy)", fontSize: "19px", lineHeight: 1.15 }}
                   >
                     {q.question}
                   </span>
                 </div>
-                <div className="grid grid-cols-1 gap-2">
+                <div className="rule mt-3 mb-3" />
+                <div className="space-y-2">
                   {q.options.map((opt, oi) => {
                     const picked = mine?.chosen_index === oi;
-                    const showResult = !!mine;
-                    const isCorrect = picked && mine?.is_correct;
+                    const verdict = picked ? mine?.is_correct : undefined; // true|false|null|undefined
+                    const settled = picked && (verdict === true || verdict === false);
                     return (
                       <button
                         key={oi}
                         type="button"
                         onClick={() => onAnswer(q.id, oi)}
-                        className="text-left rounded-lg border px-3 py-2 transition-all"
+                        className="w-full text-left border px-4 py-3 flex items-center justify-between gap-3"
                         style={{
-                          background: picked
-                            ? showResult && isCorrect
-                              ? "rgba(58, 138, 58, 0.12)"
-                              : showResult
-                              ? "rgba(107, 31, 46, 0.1)"
-                              : "var(--color-navy)"
-                            : "rgba(255,255,255,0.5)",
+                          background:
+                            picked && !settled
+                              ? "var(--color-navy)"
+                              : picked && verdict === true
+                              ? "rgba(197,160,89,0.14)"
+                              : picked && verdict === false
+                              ? "rgba(107,31,46,0.08)"
+                              : "transparent",
                           color:
-                            picked && !showResult
-                              ? "var(--color-cream)"
-                              : "var(--color-navy)",
+                            picked && !settled ? "var(--color-paper)" : "var(--color-navy)",
                           borderColor: picked
-                            ? showResult && isCorrect
-                              ? "rgb(58, 138, 58)"
-                              : showResult
-                              ? "var(--color-oxblood)"
+                            ? verdict === false
+                              ? "var(--color-destructive)"
                               : "var(--color-gold)"
                             : "var(--color-rule)",
+                          minHeight: "48px",
                         }}
                       >
-                        <span className="text-sm">{opt}</span>
-                        {picked && showResult && (
-                          <span
-                            className="float-right font-display italic text-sm"
-                            style={{
-                              color: isCorrect
-                                ? "rgb(58, 138, 58)"
-                                : "var(--color-oxblood)",
-                            }}
-                          >
-                            {isCorrect ? "✓ Mark agrees" : "✗ not quite"}
+                        <span style={{ fontSize: "15px" }}>{opt}</span>
+                        {picked && verdict === null && (
+                          <span className="label text-[8px]" style={{ color: "var(--color-paper)" }}>
+                            Checking
+                          </span>
+                        )}
+                        {picked && verdict === true && (
+                          <span className="font-display italic shrink-0" style={{ color: "var(--color-gold)", fontSize: "13px" }}>
+                            Mark agrees
+                          </span>
+                        )}
+                        {picked && verdict === false && (
+                          <span className="font-display italic shrink-0" style={{ color: "var(--color-destructive)", fontSize: "13px" }}>
+                            Not quite
                           </span>
                         )}
                       </button>
@@ -298,54 +276,117 @@ function HuntTab({
   onToggle: (id: string) => void;
 }) {
   if (!tasks) return <SkeletonList n={6} h="h-14" />;
+  const completed = tasks.filter((t) => done.has(t.id)).length;
   return (
-    <ul className="space-y-2">
-      {tasks.map((t) => {
-        const isDone = done.has(t.id);
-        return (
-          <li key={t.id}>
-            <button
-              type="button"
-              onClick={() => onToggle(t.id)}
-              className="w-full text-left rounded-xl border p-4 flex items-center gap-4 transition-all"
-              style={{
-                background: isDone
-                  ? "rgba(10, 31, 68, 0.06)"
-                  : "rgba(255, 255, 255, 0.7)",
-                borderColor: "var(--color-rule)",
-              }}
-            >
-              <div
-                className="w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0"
+    <>
+      <div
+        className="border p-4 mb-6 flex items-baseline justify-between"
+        style={{ borderColor: "var(--color-rule)" }}
+      >
+        <span className="label text-[9px]" style={{ color: "var(--color-gold)" }}>
+          The Hunt
+        </span>
+        <span className="font-display" style={{ color: "var(--color-navy)", fontSize: "20px" }}>
+          {completed} / {tasks.length}
+        </span>
+      </div>
+      <ul className="space-y-2">
+        {tasks.map((t) => {
+          const isDone = done.has(t.id);
+          return (
+            <li key={t.id}>
+              <button
+                type="button"
+                onClick={() => onToggle(t.id)}
+                className="w-full text-left border p-4 flex items-center gap-4"
                 style={{
-                  background: isDone ? "var(--color-navy)" : "transparent",
+                  background: isDone ? "var(--color-paper-warm)" : "transparent",
                   borderColor: isDone ? "var(--color-gold)" : "var(--color-rule)",
+                  minHeight: "56px",
                 }}
               >
-                {isDone && (
-                  <span
-                    className="font-display text-sm"
-                    style={{ color: "var(--color-gold-soft)" }}
-                  >
-                    ✓
+                <span
+                  className="w-5 h-5 border shrink-0 flex items-center justify-center"
+                  style={{
+                    borderColor: isDone ? "var(--color-gold)" : "var(--color-rule)",
+                    background: isDone ? "var(--color-gold)" : "transparent",
+                  }}
+                  aria-hidden
+                />
+                <span
+                  className="font-display flex-1"
+                  style={{
+                    color: "var(--color-navy)",
+                    fontSize: "16px",
+                    lineHeight: 1.3,
+                    textDecoration: isDone ? "line-through" : "none",
+                    opacity: isDone ? 0.55 : 1,
+                  }}
+                >
+                  {t.task}
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </>
+  );
+}
+
+function BoardTab({ board, meId }: { board: LeaderRow[] | null; meId: string | null }) {
+  if (board === null) return <SkeletonList n={5} h="h-12" />;
+  const ranked = board.filter((r) => r.answered > 0);
+  if (ranked.length === 0) {
+    return (
+      <p
+        className="font-display italic text-center py-12"
+        style={{ color: "var(--color-navy)", opacity: 0.5, fontSize: "16px" }}
+      >
+        No scores yet — be the first to play Mr &amp; Mrs.
+      </p>
+    );
+  }
+  return (
+    <ol className="space-y-0">
+      {ranked.map((r, i) => {
+        const mine = r.guest_id === meId;
+        return (
+          <li
+            key={r.guest_id}
+            className={`py-4 flex items-baseline justify-between ${i === 0 ? "" : "border-t"}`}
+            style={{ borderColor: "var(--color-rule)" }}
+          >
+            <div className="flex items-baseline gap-3 min-w-0">
+              <span
+                className="font-display italic tabular-nums shrink-0"
+                style={{ color: "var(--color-gold)", width: "24px", fontSize: "13px" }}
+              >
+                {i + 1}
+              </span>
+              <span
+                className="font-display truncate"
+                style={{ color: "var(--color-navy)", fontSize: "20px" }}
+              >
+                {r.display_name}
+                {mine && (
+                  <span className="label text-[8px] ml-2" style={{ color: "var(--color-gold)" }}>
+                    You
                   </span>
                 )}
-              </div>
-              <span
-                className="font-display text-base leading-snug flex-1"
-                style={{
-                  color: "var(--color-navy)",
-                  textDecoration: isDone ? "line-through" : "none",
-                  opacity: isDone ? 0.55 : 1,
-                }}
-              >
-                {t.task}
               </span>
-            </button>
+            </div>
+            <span
+              className="font-display tabular-nums shrink-0"
+              style={{ color: "var(--color-navy)", fontSize: "18px" }}
+            >
+              {r.score}
+              <span style={{ opacity: 0.45, fontSize: "13px" }}>/{r.answered}</span>
+            </span>
           </li>
         );
       })}
-    </ul>
+    </ol>
   );
 }
 
@@ -355,11 +396,8 @@ function SkeletonList({ n, h }: { n: number; h: string }) {
       {Array.from({ length: n }).map((_, i) => (
         <li
           key={i}
-          className={`rounded-xl border ${h} animate-pulse`}
-          style={{
-            background: "rgba(255, 255, 255, 0.4)",
-            borderColor: "var(--color-rule)",
-          }}
+          className={`border ${h} animate-pulse`}
+          style={{ borderColor: "var(--color-rule)" }}
         />
       ))}
     </ul>

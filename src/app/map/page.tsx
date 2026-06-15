@@ -62,7 +62,10 @@ export default function MapPage() {
       const [stopsRes, guestsRes, locsRes] = await Promise.all([
         sb.from("stops").select("*").order("position", { ascending: true }),
         sb.from("guests").select("id, display_name, is_bride, is_admin"),
-        sb.from("locations").select("*"),
+        sb
+          .from("locations")
+          .select("*")
+          .gt("expires_at", new Date().toISOString()),
       ]);
       if (cancelled) return;
       if (stopsRes.data) setStops(stopsRes.data as Stop[]);
@@ -144,6 +147,8 @@ export default function MapPage() {
             lat: pos.coords.latitude,
             lng: pos.coords.longitude,
             accuracy_m: pos.coords.accuracy ?? null,
+            updated_at: new Date().toISOString(),
+            expires_at: new Date(Date.now() + 8 * 3600_000).toISOString(),
           })
           .then(({ error }) => {
             if (error) console.error("location upsert", error);

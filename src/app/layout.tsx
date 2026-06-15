@@ -40,7 +40,7 @@ export const viewport: Viewport = {
   themeColor: EVENT.brand.colors.text,
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  // pinch-zoom left enabled (accessibility) — no maximumScale lock
 };
 
 export default function RootLayout({

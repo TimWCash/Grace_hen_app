@@ -42,7 +42,10 @@ export function LiveTonightBanner() {
           .from("stops")
           .select("id, position, time_label, title, venue, status")
           .order("position"),
-        sb.from("locations").select("guest_id"),
+        sb
+          .from("locations")
+          .select("guest_id")
+          .gt("expires_at", new Date().toISOString()),
       ]);
       if (cancelled) return;
       if (stopsRes.data) setStops(stopsRes.data as Stop[]);
