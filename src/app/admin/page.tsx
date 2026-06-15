@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { PageFrame } from "@/components/PageFrame";
 import { useGuest } from "@/components/GuestProvider";
 import { supabase } from "@/lib/supabase";
+
+const MARK_VIDEO_PATH = "mark/message.mp4";
 
 type Stop = {
   id: string;
@@ -37,6 +39,9 @@ export default function AdminPage() {
   const [flash, setFlash] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
   const [mission, setMission] = useState("");
+  const [markVideoUrl, setMarkVideoUrl] = useState<string | null>(null);
+  const [videoUploading, setVideoUploading] = useState(false);
+  const videoRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -64,6 +69,13 @@ export default function AdminPage() {
       if (!cancelled && lunchMenuRes.data) setLunchMenu(lunchMenuRes.data as LunchItem[]);
       const lunchOrderRes = await sb.from("lunch_orders").select("guest_id, course, item_id");
       if (!cancelled && lunchOrderRes.data) setLunchOrders(lunchOrderRes.data as LunchOrder[]);
+
+      // Has Mark's video already been uploaded?
+      const { data: media } = await sb.storage.from("media").list("mark");
+      if (!cancelled && media?.some((f) => f.name === "message.mp4")) {
+        const { data: pub } = sb.storage.from("media").getPublicUrl(MARK_VIDEO_PATH);
+        setMarkVideoUrl(`${pub.publicUrl}?v=${Date.now()}`);
+      }
     };
     load();
 
@@ -113,6 +125,30 @@ export default function AdminPage() {
       return false;
     }
     return true;
+  };
+
+  const uploadMarkVideo = async (file: File) => {
+    setVideoUploading(true);
+    const sb = supabase();
+    const { error } = await sb.storage
+      .from("media")
+      .upload(MARK_VIDEO_PATH, file, {
+        contentType: file.type || "video/mp4",
+        upsert: true,
+      });
+    setVideoUploading(false);
+    if (error) {
+      say(
+        error.message.includes("Bucket not found")
+          ? "Run migration 007 first (media bucket missing)."
+          : `Upload failed: ${error.message}`,
+      );
+      return;
+    }
+    const { data: pub } = sb.storage.from("media").getPublicUrl(MARK_VIDEO_PATH);
+    setMarkVideoUrl(`${pub.publicUrl}?v=${Date.now()}`);
+    say("Mark's video uploaded. Ready to send.");
+    if (videoRef.current) videoRef.current.value = "";
   };
 
   const nextOf = (s: Stop) =>
@@ -391,17 +427,59 @@ export default function AdminPage() {
           className="font-display italic"
           style={{ color: "var(--color-navy)", opacity: 0.7, fontSize: "14px" }}
         >
-          Drops a full-screen “A message from Mark” on every phone. Put the file at{" "}
-          <span className="mono">public/videos/mark.mp4</span> first.
+          {markVideoUrl
+            ? "Mark's video is loaded. Tap below and it drops full-screen on every phone."
+            : "Upload Mark's video here, then send it full-screen to every phone."}
         </p>
+
+        <input
+          ref={videoRef}
+          type="file"
+          accept="video/*"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) uploadMarkVideo(f);
+          }}
+        />
+
+        {/* Preview if uploaded */}
+        {markVideoUrl && (
+          // eslint-disable-next-line jsx-a11y/media-has-caption
+          <video
+            src={markVideoUrl}
+            controls
+            playsInline
+            className="mt-3 w-full border"
+            style={{ borderColor: "var(--color-rule)", maxHeight: "200px", background: "#000" }}
+          />
+        )}
+
         <button
           type="button"
+          onClick={() => videoRef.current?.click()}
+          disabled={videoUploading}
+          className="mt-3 w-full label text-[9px] py-3 border disabled:opacity-50"
+          style={{ borderColor: "var(--color-rule)", color: "var(--color-navy)", minHeight: "44px" }}
+        >
+          {videoUploading ? "Uploading…" : markVideoUrl ? "Replace video" : "Upload Mark's video"}
+        </button>
+
+        <button
+          type="button"
+          disabled={!markVideoUrl}
           onClick={async () => {
-            const ok = await broadcast("video", { src: "/videos/mark.mp4" }, 30);
+            if (!markVideoUrl) return;
+            const ok = await broadcast("video", { src: markVideoUrl }, 30);
             if (ok) say("Mark's video sent to every phone.");
           }}
-          className="mt-3 w-full label text-[9px] py-3 border"
-          style={{ borderColor: "var(--color-gold)", color: "var(--color-navy)", minHeight: "44px" }}
+          className="mt-2 w-full label text-[9px] py-3 border disabled:opacity-40"
+          style={{
+            background: markVideoUrl ? "var(--color-navy)" : "transparent",
+            color: markVideoUrl ? "var(--color-paper)" : "var(--color-navy)",
+            borderColor: markVideoUrl ? "var(--color-navy)" : "var(--color-rule)",
+            minHeight: "44px",
+          }}
         >
           Play Mark's video everywhere
         </button>
