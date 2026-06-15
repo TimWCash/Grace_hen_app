@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { useGuest } from "@/components/GuestProvider";
 import { STOP_COORDS } from "@/lib/geo";
 import { ChevronRight } from "lucide-react";
+import Link from "next/link";
 
 type Stop = {
   id: string;
@@ -261,11 +262,25 @@ export default function ItineraryPage() {
                           </span>
                         </DetailRow>
                         <DetailRow label="Dress">
-                          Black tie, walkable shoes.
+                          Dress in black. Sleek and bold.
                         </DetailRow>
                         <DetailRow label="Logistics">
                           {s.note ?? "—"}
                         </DetailRow>
+                        {s.venue === "The House" && (
+                          <Link
+                            href="/lunch"
+                            onClick={(e) => e.stopPropagation()}
+                            className="label text-[9px] px-3 py-2.5 border inline-flex items-center"
+                            style={{
+                              borderColor: "var(--color-gold)",
+                              color: "var(--color-navy)",
+                              minHeight: "44px",
+                            }}
+                          >
+                            Pre-order your lunch →
+                          </Link>
+                        )}
                         {isAdmin && (
                           <div className="pt-3 border-t" style={{ borderColor: "var(--color-rule)" }}>
                             <button

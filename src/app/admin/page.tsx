@@ -16,6 +16,8 @@ type Stop = {
 };
 type Menu = { id: string; stop_id: string; label: string; position: number };
 type Order = { stop_id: string; guest_id: string; option_id: string };
+type LunchItem = { id: string; course: string; label: string };
+type LunchOrder = { guest_id: string; course: string; item_id: string };
 
 const STATUS_NEXT: Record<Stop["status"], Stop["status"]> = {
   planned: "here",
@@ -29,6 +31,8 @@ export default function AdminPage() {
   const [stops, setStops] = useState<Stop[]>([]);
   const [menus, setMenus] = useState<Menu[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [lunchMenu, setLunchMenu] = useState<LunchItem[]>([]);
+  const [lunchOrders, setLunchOrders] = useState<LunchOrder[]>([]);
   const [liveTables, setLiveTables] = useState(true); // false if 003 not run
   const [flash, setFlash] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
@@ -55,6 +59,11 @@ export default function AdminPage() {
 
       const orderRes = await sb.from("drink_orders").select("*");
       if (!cancelled && orderRes.data) setOrders(orderRes.data as Order[]);
+
+      const lunchMenuRes = await sb.from("lunch_menu").select("id, course, label");
+      if (!cancelled && lunchMenuRes.data) setLunchMenu(lunchMenuRes.data as LunchItem[]);
+      const lunchOrderRes = await sb.from("lunch_orders").select("guest_id, course, item_id");
+      if (!cancelled && lunchOrderRes.data) setLunchOrders(lunchOrderRes.data as LunchOrder[]);
     };
     load();
 
@@ -63,6 +72,11 @@ export default function AdminPage() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "drink_orders" },
+        () => load(),
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "lunch_orders" },
         () => load(),
       )
       .on(
@@ -153,6 +167,21 @@ export default function AdminPage() {
     }
     return byStop;
   }, [orders, menus]);
+
+  const lunchTallies = useMemo(() => {
+    const labelOf = Object.fromEntries(lunchMenu.map((m) => [m.id, m.label]));
+    const byCourse: Record<string, Record<string, number>> = {
+      starter: {},
+      main: {},
+      dessert: {},
+    };
+    for (const o of lunchOrders) {
+      const label = labelOf[o.item_id] ?? "—";
+      byCourse[o.course] ??= {};
+      byCourse[o.course][label] = (byCourse[o.course][label] ?? 0) + 1;
+    }
+    return byCourse;
+  }, [lunchOrders, lunchMenu]);
 
   if (!isAdmin) {
     return (
@@ -313,6 +342,48 @@ export default function AdminPage() {
           );
         })}
       </Section>
+
+      {/* LUNCH ORDERS */}
+      {lunchMenu.length > 0 && (
+        <Section label="Lunch Orders · The House">
+          {(["starter", "main", "dessert"] as const).map((course) => {
+            const t = lunchTallies[course];
+            const entries = t ? Object.entries(t) : [];
+            const total = entries.reduce((n, [, c]) => n + c, 0);
+            return (
+              <div
+                key={course}
+                className="py-3 border-t first:border-t-0"
+                style={{ borderColor: "var(--color-rule)" }}
+              >
+                <div className="flex items-baseline justify-between">
+                  <span className="label text-[9px]" style={{ color: "var(--color-gold)" }}>
+                    {course}
+                  </span>
+                  <span className="label text-[9px]" style={{ color: "var(--color-navy)", opacity: 0.55 }}>
+                    {total} chosen
+                  </span>
+                </div>
+                {entries.length > 0 ? (
+                  <p
+                    className="font-display mt-1"
+                    style={{ color: "var(--color-navy)", opacity: 0.8, fontSize: "15px" }}
+                  >
+                    {entries.map(([label, count]) => `${count}× ${label}`).join("  ·  ")}
+                  </p>
+                ) : (
+                  <p
+                    className="font-display italic mt-1"
+                    style={{ color: "var(--color-navy)", opacity: 0.45, fontSize: "13px" }}
+                  >
+                    No orders yet
+                  </p>
+                )}
+              </div>
+            );
+          })}
+        </Section>
+      )}
 
       {/* MARK'S VIDEO */}
       <Section label="Mark's Moment">

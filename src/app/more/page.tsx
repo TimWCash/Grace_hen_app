@@ -6,11 +6,12 @@ import { useNightMode, type NightModeSetting } from "@/components/NightMode";
 import { Ink } from "@/components/Ink";
 
 const SECTIONS: { n: string; title: string; sub: string; href: string }[] = [
-  { n: "I", title: "The Hens", sub: "The full roll call", href: "/guests" },
-  { n: "II", title: "The Salon", sub: "Mr & Mrs · scavenger · leaderboard", href: "/games" },
-  { n: "III", title: "The Ballot", sub: "Every question of the night", href: "/polls" },
-  { n: "IV", title: "The Map", sub: "Find your squad", href: "/map" },
-  { n: "V", title: "Essentials", sub: "Dress · contacts · taxis · lost?", href: "/essentials" },
+  { n: "I", title: "Lunch", sub: "Pre-order your courses", href: "/lunch" },
+  { n: "II", title: "The Hens", sub: "The full roll call", href: "/guests" },
+  { n: "III", title: "The Salon", sub: "Mr & Mrs · scavenger · leaderboard", href: "/games" },
+  { n: "IV", title: "The Ballot", sub: "Every question of the night", href: "/polls" },
+  { n: "V", title: "The Map", sub: "Find your squad", href: "/map" },
+  { n: "VI", title: "Essentials", sub: "Dress · contacts · taxis · lost?", href: "/essentials" },
 ];
 
 export default function MorePage() {
@@ -97,7 +98,7 @@ export default function MorePage() {
                   className="font-display italic tabular-nums w-8 shrink-0"
                   style={{ color: "var(--color-gold)", fontSize: "13px" }}
                 >
-                  VI.
+                  VII.
                 </span>
                 <div className="flex-1">
                   <div
