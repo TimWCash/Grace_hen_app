@@ -12,7 +12,7 @@
 drop table if exists public.broadcasts cascade;
 create table public.broadcasts (
   id          uuid primary key default gen_random_uuid(),
-  kind        text not null check (kind in ('go','notice','video','mission')),
+  kind        text not null check (kind in ('go','notice','video','mission','warning')),
   payload     jsonb not null default '{}',
   created_by  uuid references public.guests(id) on delete set null,
   created_at  timestamptz not null default now(),
@@ -51,7 +51,8 @@ create table public.stop_menus (
   id        uuid primary key default gen_random_uuid(),
   stop_id   uuid not null references public.stops(id) on delete cascade,
   position  integer not null,
-  label     text not null
+  label     text not null,
+  note      text            -- short tasting note (e.g. "strong, deep, rich")
 );
 create index stop_menus_stop_idx on public.stop_menus (stop_id, position);
 

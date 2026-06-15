@@ -3,16 +3,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { getCurrentGuest } from "@/lib/guest";
 import { Ink } from "./Ink";
 
 type Broadcast = {
   id: string;
-  kind: "go" | "notice" | "video" | "mission";
+  kind: "go" | "notice" | "video" | "mission" | "warning";
   payload: {
     message?: string;
     venue?: string;
     time?: string;
     src?: string;
+    stopId?: string;
+    departAt?: string; // ISO — when the group leaves
   };
   created_at: string;
   expires_at: string | null;
@@ -106,11 +109,12 @@ export function BroadcastListener() {
         {active.kind === "go" && <GoTakeover b={active} />}
         {active.kind === "notice" && <NoticeTakeover b={active} />}
         {active.kind === "video" && <VideoTakeover b={active} />}
+        {active.kind === "warning" && <WarningTakeover b={active} />}
 
         <button
           type="button"
           onClick={dismiss}
-          className="mt-12 px-8 py-4 border label text-[10px]"
+          className="mt-10 px-8 py-4 border label text-[10px]"
           style={{
             borderColor: "rgba(245,245,245,0.4)",
             color: "#f5f5f5",
@@ -118,7 +122,7 @@ export function BroadcastListener() {
             minHeight: "48px",
           }}
         >
-          Got it
+          {active.kind === "warning" ? "Done" : "Got it"}
         </button>
       </div>
     </div>
@@ -237,6 +241,164 @@ function VideoTakeover({ b }: { b: Broadcast }) {
             Tap to play
           </span>
         </button>
+      )}
+    </Ink>
+  );
+}
+
+type Cocktail = { id: string; label: string; note: string | null; position: number };
+
+function WarningTakeover({ b }: { b: Broadcast }) {
+  const [remaining, setRemaining] = useState<number>(() =>
+    b.payload.departAt
+      ? Math.max(0, new Date(b.payload.departAt).getTime() - Date.now())
+      : 0,
+  );
+  const [cocktails, setCocktails] = useState<Cocktail[]>([]);
+  const [guestId, setGuestId] = useState<string | null>(null);
+  const [ordered, setOrdered] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  // Tick the countdown.
+  useEffect(() => {
+    if (!b.payload.departAt) return;
+    const id = setInterval(() => {
+      setRemaining(
+        Math.max(0, new Date(b.payload.departAt!).getTime() - Date.now()),
+      );
+    }, 1000);
+    return () => clearInterval(id);
+  }, [b.payload.departAt]);
+
+  // Load this bar's cocktail list + the guest's existing order.
+  useEffect(() => {
+    if (!b.payload.stopId) return;
+    const sb = supabase();
+    let cancelled = false;
+    (async () => {
+      const guest = await getCurrentGuest();
+      if (cancelled) return;
+      setGuestId(guest?.id ?? null);
+      const { data } = await sb
+        .from("stop_menus")
+        .select("id, label, note, position")
+        .eq("stop_id", b.payload.stopId)
+        .order("position");
+      if (!cancelled && data) setCocktails(data as Cocktail[]);
+      if (guest) {
+        const { data: existing } = await sb
+          .from("drink_orders")
+          .select("option_id")
+          .eq("stop_id", b.payload.stopId)
+          .eq("guest_id", guest.id)
+          .maybeSingle();
+        if (!cancelled && existing) setOrdered(existing.option_id);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [b.payload.stopId]);
+
+  const order = async (optionId: string) => {
+    if (!guestId || !b.payload.stopId) return;
+    setSaving(true);
+    setOrdered(optionId);
+    const sb = supabase();
+    await sb.from("drink_orders").upsert(
+      { stop_id: b.payload.stopId, guest_id: guestId, option_id: optionId },
+      { onConflict: "stop_id,guest_id" },
+    );
+    setSaving(false);
+  };
+
+  const mins = Math.floor(remaining / 60000);
+  const secs = Math.floor((remaining % 60000) / 1000);
+  const departed = remaining <= 0;
+
+  return (
+    <Ink duration={0.8}>
+      <p className="label text-[10px]" style={{ color: "#C5A059" }}>
+        {departed ? "Time to Move" : "Leaving Soon"}
+      </p>
+
+      {/* Countdown */}
+      <div
+        className="font-display tabular-nums mt-4"
+        style={{
+          fontSize: "clamp(56px, 16vw, 88px)",
+          lineHeight: 0.9,
+          letterSpacing: "-0.03em",
+          color: "#f5f5f5",
+        }}
+      >
+        {departed
+          ? "Go"
+          : `${mins}:${String(secs).padStart(2, "0")}`}
+      </div>
+
+      <p
+        className="font-display italic mt-3"
+        style={{ color: "rgba(245,245,245,0.85)", fontSize: "17px" }}
+      >
+        {departed ? "On to " : "Next — "}
+        {b.payload.venue ?? "the next bar"}
+      </p>
+
+      {/* Order prompt + cocktails */}
+      {!departed && cocktails.length > 0 && (
+        <div className="mt-7">
+          <p className="label text-[9px]" style={{ color: "#C5A059" }}>
+            {ordered ? "Your order — Fiona has it" : "Order your next drink now"}
+          </p>
+          <ul className="mt-3 space-y-2 text-left">
+            {cocktails.map((c) => {
+              const mine = ordered === c.id;
+              return (
+                <li key={c.id}>
+                  <button
+                    type="button"
+                    disabled={saving}
+                    onClick={() => order(c.id)}
+                    className="w-full text-left px-4 py-3 border flex items-center justify-between gap-3"
+                    style={{
+                      borderColor: mine ? "#C5A059" : "rgba(245,245,245,0.25)",
+                      background: mine
+                        ? "rgba(197,160,89,0.15)"
+                        : "transparent",
+                      minHeight: "48px",
+                    }}
+                  >
+                    <span className="min-w-0">
+                      <span
+                        className="font-display block"
+                        style={{ color: "#f5f5f5", fontSize: "16px" }}
+                      >
+                        {c.label}
+                      </span>
+                      {c.note && (
+                        <span
+                          className="block label text-[8px] mt-0.5"
+                          style={{ color: "rgba(245,245,245,0.55)" }}
+                        >
+                          {c.note}
+                        </span>
+                      )}
+                    </span>
+                    {mine && (
+                      <span
+                        className="label text-[8.5px] shrink-0"
+                        style={{ color: "#C5A059" }}
+                      >
+                        Ordered ✓
+                      </span>
+                    )}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       )}
     </Ink>
   );

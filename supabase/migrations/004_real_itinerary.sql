@@ -63,11 +63,13 @@ insert into public.quiz_questions (position, question, options, correct_index) v
       '["Cork","Galway","Dublin","Limerick"]'::jsonb, 2),
   (3, 'Mark''s birthday?',
       '["6 June","16 April","11 July","28 June"]'::jsonb, 0),
-  (4, 'Where did Mark first say he loved her? [Mark to confirm]',
+  (4, 'What was Mark wearing when he proposed?',
+      '["A tuxedo","A Bulls sweatshirt","A shirt and tie","His gym kit"]'::jsonb, 1),
+  (5, 'Where did Mark first say he loved her? [Mark to confirm]',
       '["A taxi","Howth cliffs","The kitchen","Phoenix Park"]'::jsonb, 1),
-  (5, 'Who said I love you first? [Mark to confirm]',
+  (6, 'Who said I love you first? [Mark to confirm]',
       '["Grace, obviously","Mark, obviously","It was mutual","Neither remembers"]'::jsonb, 1),
-  (6, 'Mark''s nickname for Grace? [Mark to confirm]',
+  (7, 'Mark''s nickname for Grace? [Mark to confirm]',
       '["G","Bunny","Gracie","The Boss"]'::jsonb, 3);
 
 -- ─── SCAVENGER ───────────────────────────────────────────────

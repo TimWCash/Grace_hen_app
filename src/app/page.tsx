@@ -9,88 +9,101 @@ import Image from "next/image";
 export default function HomePage() {
   return (
     <article>
-      {/* ─── SPREAD 01: HERO — GRACE ──────────────────────────────────── */}
-      <section className="relative">
-        <Ink delay={0.1} duration={1.8}>
-          <div className="relative w-full aspect-[4/5] sm:aspect-[3/4] overflow-hidden bg-black">
-            <video
-              className="absolute inset-0 w-full h-full object-cover"
-              src="/photos/grace-dancer.mp4"
-              poster="/photos/grace-dancer.jpg"
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              aria-label="Grace, in the dance studio"
-            />
-            {/* Overlay credit, top-right, magazine style */}
-            <div className="absolute top-5 right-5">
-              <p
-                className="text-[8.5px] uppercase tracking-eyebrow font-medium text-right"
-                style={{ color: "rgba(248, 245, 238, 0.85)" }}
+      {/* ─── COVER: full-bleed video ──────────────────────────────────── */}
+      <section className="relative w-full min-h-[100svh] overflow-hidden bg-black">
+        {/* Background video fills the viewport */}
+        <video
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ objectPosition: "center 25%" }}
+          src="/photos/grace-dancer.mp4"
+          poster="/photos/grace-dancer.jpg"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          aria-label="Grace, in the dance studio"
+        />
+        {/* Scrim: darken top + bottom for legibility, leave her mid-frame clear */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(to bottom, rgba(0,20,40,0.55) 0%, rgba(0,20,40,0.05) 28%, rgba(0,20,40,0.12) 55%, rgba(0,20,40,0.85) 100%)",
+          }}
+        />
+
+        {/* Masthead, top */}
+        <div className="absolute top-0 left-0 right-0 px-6 pt-8">
+          <Ink delay={0.1}>
+            <div className="flex items-center justify-between">
+              <span
+                className="text-[9px] uppercase tracking-eyebrow font-medium"
+                style={{ color: "rgba(245,245,245,0.85)" }}
+              >
+                Private
+              </span>
+              <span
+                className="text-[9px] uppercase tracking-eyebrow font-medium"
+                style={{ color: "rgba(245,245,245,0.85)" }}
               >
                 Summer 2026
-              </p>
+              </span>
             </div>
-            <div className="absolute bottom-5 left-5">
-              <p
-                className="text-[8.5px] uppercase tracking-eyebrow font-medium"
-                style={{ color: "rgba(248, 245, 238, 0.85)" }}
-              >
-                Grace · the dance studio
-              </p>
-            </div>
-          </div>
-        </Ink>
-      </section>
+            <div
+              className="mt-3"
+              style={{ height: "0.5px", background: "rgba(245,245,245,0.3)" }}
+            />
+          </Ink>
+        </div>
 
-      {/* ─── SPREAD 02: TITLE BLOCK ───────────────────────────────────── */}
-      <section className="mx-auto max-w-[640px] px-6 pt-16 pb-20 text-center">
-        <Ink delay={0.15}>
-          <p
-            className="font-display italic"
-            style={{
-              color: "var(--color-ink)",
-              opacity: 0.7,
-              fontSize: "18px",
-            }}
-          >
-            Dublin, 27 June 2026
-          </p>
-        </Ink>
+        {/* Title block, anchored bottom — magazine cover (clears fixed nav) */}
+        <div className="absolute bottom-0 left-0 right-0 px-6 pb-28 text-center">
+          <Ink delay={0.3} duration={1.6}>
+            <p
+              className="font-display italic"
+              style={{ color: "rgba(245,245,245,0.9)", fontSize: "18px" }}
+            >
+              Dublin, 27 June 2026
+            </p>
+          </Ink>
 
-        <Ink delay={0.3}>
-          <h1
-            className="font-display mt-5"
-            style={{
-              fontSize: "clamp(84px, 22vw, 168px)",
-              lineHeight: 0.84,
-              letterSpacing: "-0.045em",
-              fontWeight: 500,
-              color: "var(--color-ink)",
-            }}
-          >
-            GRACE
-          </h1>
-        </Ink>
+          <Ink delay={0.45} duration={1.6}>
+            <h1
+              className="font-display mt-3"
+              style={{
+                fontSize: "clamp(84px, 24vw, 180px)",
+                lineHeight: 0.82,
+                letterSpacing: "-0.045em",
+                fontWeight: 500,
+                color: "#f5f5f5",
+                textShadow: "0 2px 40px rgba(0,0,0,0.4)",
+              }}
+            >
+              GRACE
+            </h1>
+          </Ink>
 
-        <Ink delay={0.45}>
-          <p
-            className="mt-6 text-[10px] uppercase tracking-eyebrow font-medium"
-            style={{ color: "var(--color-ink)", opacity: 0.65 }}
-          >
-            The Hen Weekend
-          </p>
-        </Ink>
+          <Ink delay={0.6}>
+            <p
+              className="mt-5 text-[10px] uppercase tracking-eyebrow font-medium"
+              style={{ color: "rgba(245,245,245,0.8)" }}
+            >
+              The Hen Weekend
+            </p>
+          </Ink>
 
-        <Ink delay={0.6}>
-          <div className="rule-gold mx-auto mt-7 w-10" />
-        </Ink>
+          <Ink delay={0.72}>
+            <div
+              className="mx-auto mt-6 w-10"
+              style={{ height: "0.5px", background: "var(--color-rule-gold)" }}
+            />
+          </Ink>
 
-        <Ink delay={0.75}>
-          <HenHeroCountdown target={HEN_DATE} />
-        </Ink>
+          <Ink delay={0.82}>
+            <HenHeroCountdown target={HEN_DATE} light />
+          </Ink>
+        </div>
       </section>
 
       {/* ─── DAILY BRIEFING ───────────────────────────────────────────── */}
