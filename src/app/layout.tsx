@@ -4,6 +4,9 @@ import "./globals.css";
 import { Nav } from "@/components/Nav";
 import { AuthGate } from "@/components/AuthGate";
 import { LiveTonightBanner } from "@/components/LiveTonightBanner";
+import { NightModeProvider } from "@/components/NightMode";
+import { BroadcastListener } from "@/components/BroadcastListener";
+import { EVENT } from "@/config/event";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -19,23 +22,22 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Grace & Mark — Summer 2026",
-  description:
-    "Private invitation. Dublin, 28 June 2026. The hen weekend of Grace Canning.",
-  applicationName: "Grace & Mark",
+  title: EVENT.app.title,
+  description: "Private invitation. Dublin, 27 June 2026. Grace's hen.",
+  applicationName: EVENT.app.shortName,
   appleWebApp: {
     capable: true,
-    title: "Grace & Mark",
+    title: EVENT.app.shortName,
     statusBarStyle: "black-translucent",
   },
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: "/icon.svg",
+    icon: EVENT.brand.icon,
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#14110f",
+  themeColor: EVENT.brand.colors.text,
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -52,11 +54,14 @@ export default function RootLayout({
       className={`${playfair.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <AuthGate>
-          <LiveTonightBanner />
-          <main className="flex-1 pb-28">{children}</main>
-          <Nav />
-        </AuthGate>
+        <NightModeProvider>
+          <AuthGate>
+            <BroadcastListener />
+            <LiveTonightBanner />
+            <main className="flex-1 pb-28">{children}</main>
+            <Nav />
+          </AuthGate>
+        </NightModeProvider>
       </body>
     </html>
   );

@@ -85,7 +85,7 @@ export function AuthGate({ children }: AuthGateProps) {
             className="font-display italic text-center mt-8"
             style={{ color: "var(--color-ink)", opacity: 0.7, fontSize: "16px" }}
           >
-            Dublin · 28 June 2026
+            Dublin · 27 June 2026
           </p>
           <h1
             className="font-display text-center mt-6"
@@ -163,7 +163,7 @@ export function AuthGate({ children }: AuthGateProps) {
             className="mt-10 text-[9px] uppercase tracking-eyebrow font-medium text-center"
             style={{ color: "var(--color-ink)", opacity: 0.4 }}
           >
-            Hen · 28 June · Wedding · 11 July
+            Hen · 27 June · Wedding · 11 July
           </p>
         </Ink>
       </div>

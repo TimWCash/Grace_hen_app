@@ -95,7 +95,7 @@ export default function ItineraryPage() {
   return (
     <PageFrame
       sectionMark="I"
-      eyebrow="Saturday · 28 June 2026"
+      eyebrow="Saturday · 27 June 2026"
       title="The Program"
       subtitle="Six bars, in order. Tap any row to expand."
     >

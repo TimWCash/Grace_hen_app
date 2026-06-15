@@ -13,14 +13,16 @@ export function project(lat: number, lng: number): { x: number; y: number } {
   };
 }
 
-// Real approximate coordinates for the cocktail-crawl stops.
+// Coordinates for the real stops, keyed by the `venue` string in the
+// stops table (see migration 004). These are APPROXIMATE Dublin
+// city-centre placeholders — confirm exact venue locations and update.
+// TODO(Tim): verify the real addresses for Pen & Player / Landmark /
+// Maneki and the house, then set precise lat/lng here.
 export const STOP_COORDS: Record<string, { lat: number; lng: number }> = {
-  "The Horseshoe Bar": { lat: 53.338, lng: -6.257 },
-  "9 Below": { lat: 53.3381, lng: -6.2575 },
-  "Vintage Cocktail Club": { lat: 53.345, lng: -6.2625 },
-  "Bar 1661": { lat: 53.3475, lng: -6.271 },
-  "Peruke & Periwig": { lat: 53.3415, lng: -6.258 },
-  "The Blind Pig": { lat: 53.342, lng: -6.262 },
+  "The House": { lat: 53.3382, lng: -6.2536 }, // TK — Grace's / the host's house
+  "Pen & Player": { lat: 53.3392, lng: -6.2585 }, // TK
+  "Landmark": { lat: 53.3405, lng: -6.2602 }, // TK
+  "Maneki": { lat: 53.3439, lng: -6.2624 }, // TK
 };
 
 export function shortVenue(label: string | null | undefined): string {

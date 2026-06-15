@@ -10,12 +10,14 @@ type Item = {
 
 const items: Item[] = [
   { href: "/", label: "Cover" },
+  { href: "/tonight", label: "Tonight" },
   { href: "/itinerary", label: "Program" },
-  { href: "/map", label: "Squad" },
   { href: "/photos", label: "Trophy" },
-  { href: "/guests", label: "Hens" },
-  { href: "/polls", label: "Ballot" },
+  { href: "/more", label: "More" },
 ];
+
+// Sub-pages reached via /more highlight the More tab.
+const MORE_SECTIONS = ["/guests", "/games", "/polls", "/map", "/essentials", "/settings", "/admin"];
 
 export function Nav() {
   const pathname = usePathname();
@@ -27,21 +29,27 @@ export function Nav() {
         borderColor: "var(--color-rule)",
       }}
     >
-      <ul className="mx-auto max-w-[640px] grid grid-cols-6">
+      <ul className="mx-auto max-w-[640px] grid grid-cols-5">
         {items.map(({ href, label }) => {
           const active =
-            href === "/" ? pathname === "/" : pathname?.startsWith(href);
+            href === "/"
+              ? pathname === "/"
+              : href === "/more"
+              ? pathname?.startsWith("/more") ||
+                MORE_SECTIONS.some((s) => pathname?.startsWith(s))
+              : pathname?.startsWith(href);
           return (
             <li key={href} className="flex">
               <Link
                 href={href}
-                className="flex flex-1 items-center justify-center py-3.5 relative"
+                className="flex flex-1 items-center justify-center py-4 relative"
+                style={{ minHeight: "52px" }}
                 aria-current={active ? "page" : undefined}
               >
                 <span
-                  className="text-[9px] uppercase tracking-eyebrow"
+                  className="label text-[9.5px]"
                   style={{
-                    color: active ? "var(--color-ink)" : "var(--color-ink)",
+                    color: "var(--color-navy)",
                     opacity: active ? 1 : 0.55,
                     fontWeight: active ? 600 : 400,
                   }}
@@ -50,7 +58,7 @@ export function Nav() {
                 </span>
                 {active && (
                   <span
-                    className="absolute bottom-1 left-1/2 -translate-x-1/2 w-5 h-px"
+                    className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-5 h-px"
                     style={{ background: "var(--color-gold)" }}
                     aria-hidden
                   />

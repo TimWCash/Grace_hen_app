@@ -56,7 +56,7 @@ export default function HomePage() {
               fontSize: "18px",
             }}
           >
-            Dublin, 28 June 2026
+            Dublin, 27 June 2026
           </p>
         </Ink>
 

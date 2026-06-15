@@ -32,7 +32,8 @@ export const EVENT = {
 
   /** Core dates */
   dates: {
-    hen: new Date("2026-06-28T17:00:00+01:00"),
+    // Hen: Saturday 27 June 2026, lunch at the house at 2:15pm (IST = UTC+1).
+    hen: new Date("2026-06-27T14:15:00+01:00"),
     wedding: new Date("2026-07-11T14:00:00+01:00"),
     /** When sealed photos develop — defaults to wedding day at 14:00 */
     photoReveal: new Date("2026-07-11T14:00:00+01:00"),
@@ -64,13 +65,39 @@ export const EVENT = {
   app: {
     title: "Grace & Mark — Summer 2026",
     shortName: "Grace & Mark",
-    description: "Private invitation. Dublin, 28 June 2026.",
+    description: "Private invitation. Dublin, 27 June 2026.",
   },
 
   /** Concierge passcode — currently a duplicate of the Supabase value for
    * client-side display hints. The authoritative check still happens
    * server-side via verify_passcode(). */
   passcodeHint: "BrideSquad2026",
+
+  /** Essentials — logistics shown on /essentials. TK fields await Tim. */
+  essentials: {
+    dressCode: "Dress in black. Sleek and bold.",
+    meetingPoint: {
+      label: "Curtain up",
+      value: "The house — 2:15pm, lunch before the off",
+    },
+    hotel: {
+      label: "Base for the night",
+      value: "[Address TK — ask Fiona]",
+    },
+    contacts: [
+      {
+        name: "Fiona Canning",
+        role: "Maid of Honour · runs the night",
+        phone: "[TK]",
+      },
+    ],
+    taxis: [
+      "FREE NOW app — works everywhere in Dublin",
+      "Lynk Taxis · 01 820 2020",
+    ],
+    lostProtocol:
+      "Open the Map and turn on location sharing — the squad will find you. Failing that, ring Fiona and stay where you are.",
+  },
 } as const;
 
 export type EventConfig = typeof EVENT;
