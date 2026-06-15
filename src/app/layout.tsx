@@ -6,6 +6,7 @@ import { AuthGate } from "@/components/AuthGate";
 import { LiveTonightBanner } from "@/components/LiveTonightBanner";
 import { NightModeProvider } from "@/components/NightMode";
 import { BroadcastListener } from "@/components/BroadcastListener";
+import { InstallPrompt } from "@/components/InstallPrompt";
 import { EVENT } from "@/config/event";
 
 const playfair = Playfair_Display({
@@ -59,6 +60,7 @@ export default function RootLayout({
             <BroadcastListener />
             <LiveTonightBanner />
             <main className="flex-1 pb-28">{children}</main>
+            <InstallPrompt />
             <Nav />
           </AuthGate>
         </NightModeProvider>

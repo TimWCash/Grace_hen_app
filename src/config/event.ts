@@ -77,11 +77,11 @@ export const EVENT = {
     },
     hotel: {
       label: "Base for the night",
-      value: "[Address TK — ask Fiona]",
+      value: "[Address TK — ask Claire]",
     },
     contacts: [
       {
-        name: "Fiona Canning",
+        name: "Claire Canning",
         role: "Maid of Honour · runs the night",
         phone: "[TK]",
       },
@@ -91,7 +91,7 @@ export const EVENT = {
       "Lynk Taxis · 01 820 2020",
     ],
     lostProtocol:
-      "Open the Map and turn on location sharing — the squad will find you. Failing that, ring Fiona and stay where you are.",
+      "Open the Map and turn on location sharing — the squad will find you. Failing that, ring Claire and stay where you are.",
   },
 } as const;
 

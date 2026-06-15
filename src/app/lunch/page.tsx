@@ -100,7 +100,7 @@ export default function LunchPage() {
       sectionMark="Lunch"
       eyebrow="The House · 2:15pm"
       title="Lunch, Pre-Ordered"
-      subtitle="Pick a course each — Fiona sends the order ahead so it's ready when we sit down."
+      subtitle="Pick a course each — Claire sends the order ahead so it's ready when we sit down."
     >
       <div
         className="mb-8 px-4 py-3 border text-center"
@@ -209,7 +209,7 @@ export default function LunchPage() {
         className="font-display italic text-center mt-6"
         style={{ color: "var(--color-navy)", opacity: 0.55, fontSize: "13px" }}
       >
-        Change your mind any time before the day — Fiona sees the latest.
+        Change your mind any time before the day — Claire sees the latest.
       </p>
     </PageFrame>
   );

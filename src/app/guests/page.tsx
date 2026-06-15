@@ -128,18 +128,20 @@ function Portrait({ hen, index }: { hen: Hen; index: number }) {
           {hen.relation}
         </p>
 
-        <p
-          className="font-display italic mt-3"
-          style={{
-            color: "var(--color-ink)",
-            opacity: 0.78,
-            fontSize: "15px",
-            lineHeight: 1.5,
-            letterSpacing: "-0.005em",
-          }}
-        >
-          {hen.funFact}
-        </p>
+        {hen.funFact && (
+          <p
+            className="font-display italic mt-3"
+            style={{
+              color: "var(--color-ink)",
+              opacity: 0.78,
+              fontSize: "15px",
+              lineHeight: 1.5,
+              letterSpacing: "-0.005em",
+            }}
+          >
+            {hen.funFact}
+          </p>
+        )}
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useGuest } from "@/components/GuestProvider";
 import { MissionBlock } from "@/components/Mission";
+import { AlertsPrimer } from "@/components/AlertsPrimer";
 import { Ink } from "@/components/Ink";
 import { HEN_DATE, countdownParts } from "@/lib/dates";
 
@@ -102,8 +103,12 @@ export default function TonightPage() {
         <div className="rule mt-5" />
       </header>
 
+      <div className="pt-6">
+        <AlertsPrimer />
+      </div>
+
       <Ink delay={0.05}>
-        <section className="py-8">
+        <section className="pb-8">
           <NextUp now={now} stops={stops} />
         </section>
       </Ink>

@@ -4,7 +4,23 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { getCurrentGuest } from "@/lib/guest";
+import { fireAlert } from "@/lib/alerts";
 import { Ink } from "./Ink";
+
+function alertTextFor(b: { kind: string; payload: { venue?: string; message?: string } }): [string, string] {
+  switch (b.kind) {
+    case "go":
+      return ["Time to move", b.payload.venue ? `On to ${b.payload.venue}` : "We're moving"];
+    case "warning":
+      return ["Leaving soon", b.payload.venue ? `Order your next drink — ${b.payload.venue}` : "Order your next drink"];
+    case "video":
+      return ["A message from Mark", "Tap to watch"];
+    case "notice":
+      return ["From the Concierge", b.payload.message ?? ""];
+    default:
+      return ["", ""];
+  }
+}
 
 type Broadcast = {
   id: string;
@@ -80,7 +96,15 @@ export function BroadcastListener() {
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "broadcasts" },
-        (payload) => consider(payload.new as Broadcast),
+        (payload) => {
+          const b = payload.new as Broadcast;
+          // Real-time arrival → buzz/chime/notify (not on the catch-up load).
+          if (b.kind !== "mission" && !dismissedRef.current.includes(b.id)) {
+            const [title, body] = alertTextFor(b);
+            if (title) fireAlert(title, body);
+          }
+          consider(b);
+        },
       )
       .subscribe();
 
@@ -349,7 +373,7 @@ function WarningTakeover({ b }: { b: Broadcast }) {
       {!departed && cocktails.length > 0 && (
         <div className="mt-7">
           <p className="label text-[9px]" style={{ color: "#C5A059" }}>
-            {ordered ? "Your order — Fiona has it" : "Order your next drink now"}
+            {ordered ? "Your order — Claire has it" : "Order your next drink now"}
           </p>
           <ul className="mt-3 space-y-2 text-left">
             {cocktails.map((c) => {

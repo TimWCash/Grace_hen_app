@@ -61,7 +61,7 @@ export default function SettingsPage() {
               className="font-display italic text-center"
               style={{ color: "var(--color-navy)", opacity: 0.75, fontSize: "14px" }}
             >
-              For Fiona. Unlocks running the night — warnings, orders, the album.
+              For Claire. Unlocks running the night — warnings, orders, the album.
             </p>
             <form
               onSubmit={async (e) => {

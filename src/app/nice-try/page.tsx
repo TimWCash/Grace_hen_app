@@ -37,7 +37,7 @@ export default function NiceTryPage() {
           }}
         >
           This party is by invitation only. If you should be on the list, ask
-          Fiona — the rest of you may show yourselves out.
+          Claire — the rest of you may show yourselves out.
         </p>
         <div className="rule-gold mt-10 mx-auto w-10" />
         <Link
