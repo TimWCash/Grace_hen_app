@@ -33,4 +33,9 @@ insert into public.quiz_questions (position, category, question, options, correc
   (9,  'guess_who', 'Who''s more romantic?',        '["Grace","Mark"]'::jsonb, 1),
   (10, 'guess_who', 'Who''s the better driver?',    '["Grace","Mark"]'::jsonb, 1),
   (11, 'guess_who', 'Who''s the morning person?',   '["Grace","Mark"]'::jsonb, 0),
-  (12, 'guess_who', 'Who''s the big spender?',      '["Grace","Mark"]'::jsonb, 0);
+  (12, 'guess_who', 'Who''s the big spender?',      '["Grace","Mark"]'::jsonb, 0),
+  (13, 'guess_who', 'Who takes longer to get ready?', '["Grace","Mark"]'::jsonb, 0),
+  (14, 'guess_who', 'Who takes longer showers?',    '["Grace","Mark"]'::jsonb, 1),
+  (15, 'guess_who', 'Who''ll cry on the big day?',   '["Grace","Mark"]'::jsonb, 0),
+  (16, 'guess_who', 'Who''s most likely to be late?', '["Grace","Mark"]'::jsonb, 1),
+  (17, 'guess_who', 'Who''s more patient?',          '["Grace","Mark"]'::jsonb, 1);
