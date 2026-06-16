@@ -34,7 +34,7 @@ export const HENS: Hen[] = [
   },
   { id: "orla", name: "Orla Canning", relation: "Sister of the bride" },
   { id: "mam", name: "Mammy Canning", relation: "Mother of the bride" },
-  { id: "leanne", name: "Leanne Brennan", relation: "The groom's side" },
+  { id: "leanne", name: "Leanne Brennan", relation: "Sister of the groom" },
   { id: "ciara", name: "Ciara", relation: "Hen" },
   { id: "robyn", name: "Robyn", relation: "Hen" },
   { id: "anne", name: "Anne Lavelle", relation: "Hen" },
@@ -43,7 +43,7 @@ export const HENS: Hen[] = [
   { id: "laura", name: "Laura O'Neill", relation: "Hen" },
   { id: "louise", name: "Louise Haran", relation: "Hen" },
   { id: "megan", name: "Megan", relation: "Hen" },
-  { id: "paula", name: "Paula", relation: "Hen" },
+  { id: "paula", name: "Paula Brennan", relation: "Mother of the groom" },
   { id: "roisin", name: "Roisin", relation: "Hen" },
   { id: "sarah", name: "Sarah McLoughlin", relation: "Hen" },
 ];
