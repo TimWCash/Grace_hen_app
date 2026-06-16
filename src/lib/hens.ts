@@ -28,6 +28,7 @@ export const HENS: Hen[] = [
   },
   { id: "fiona", name: "Fiona Canning", relation: "Sister of the bride" },
   { id: "orla", name: "Orla Canning", relation: "Family" },
+  { id: "mam", name: "Mammy Canning", relation: "Mother of the bride" },
   { id: "leanne", name: "Leanne Brennan", relation: "The groom's side" },
   { id: "ciara", name: "Ciara", relation: "Hen" },
   { id: "robyn", name: "Robyn", relation: "Hen" },
