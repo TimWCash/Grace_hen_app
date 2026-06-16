@@ -113,7 +113,8 @@ create table public.quiz_questions (
   position        integer not null,
   question        text not null,
   options         jsonb not null,
-  correct_index   integer not null
+  correct_index   integer not null,
+  category        text not null default 'mr_mrs'  -- 'mr_mrs' | 'guess_who'
 );
 
 create table public.quiz_answers (
@@ -286,8 +287,8 @@ create policy "scavenger completions write self" on public.scavenger_completions
 
 -- View that hides correct_index from clients
 create or replace view public.quiz_public as
-  select id, position, question, options from public.quiz_questions
-  order by position;
+  select id, position, question, options, category from public.quiz_questions
+  order by category, position;
 grant select on public.quiz_public to authenticated;
 
 -- ============================================================
@@ -368,6 +369,21 @@ insert into public.quiz_questions (position, question, options, correct_index) v
       '["Grace, obviously","Mark, obviously","It was mutual","Neither remembers"]'::jsonb, 1),
   (7, 'Mark''s nickname for Grace? [Mark to confirm]',
       '["G","Bunny","Gracie","The Boss"]'::jsonb, 3);
+
+-- Guess Who · Bride or Groom — options [Grace, Mark]; 0 = Grace, 1 = Mark.
+insert into public.quiz_questions (position, category, question, options, correct_index) values
+  (1,  'guess_who', 'Who paid for the first date?', '["Grace","Mark"]'::jsonb, 1),
+  (2,  'guess_who', 'Who''s the better dancer?',    '["Grace","Mark"]'::jsonb, 1),
+  (3,  'guess_who', 'Who made the first move?',     '["Grace","Mark"]'::jsonb, 1),
+  (4,  'guess_who', 'Who said I love you first?',   '["Grace","Mark"]'::jsonb, 1),
+  (5,  'guess_who', 'Who''s the better cook?',      '["Grace","Mark"]'::jsonb, 1),
+  (6,  'guess_who', 'Who''s more spontaneous?',     '["Grace","Mark"]'::jsonb, 1),
+  (7,  'guess_who', 'Who''s the messy one?',        '["Grace","Mark"]'::jsonb, 0),
+  (8,  'guess_who', 'Who''s the better dresser?',   '["Grace","Mark"]'::jsonb, 0),
+  (9,  'guess_who', 'Who''s more romantic?',        '["Grace","Mark"]'::jsonb, 1),
+  (10, 'guess_who', 'Who''s the better driver?',    '["Grace","Mark"]'::jsonb, 1),
+  (11, 'guess_who', 'Who''s the morning person?',   '["Grace","Mark"]'::jsonb, 0),
+  (12, 'guess_who', 'Who''s the big spender?',      '["Grace","Mark"]'::jsonb, 0);
 
 insert into public.scavenger_tasks (position, task) values
   (1, 'A photo with a Garda'),
