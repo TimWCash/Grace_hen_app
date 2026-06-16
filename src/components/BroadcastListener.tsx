@@ -124,30 +124,47 @@ export function BroadcastListener() {
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center px-6"
+      className="fixed inset-0 z-[100] overflow-y-auto"
       style={{ background: "rgba(0, 20, 40, 0.97)" }}
       role="alertdialog"
       aria-modal="true"
     >
-      <div className="w-full max-w-[420px] text-center">
-        {active.kind === "go" && <GoTakeover b={active} />}
-        {active.kind === "notice" && <NoticeTakeover b={active} />}
-        {active.kind === "video" && <VideoTakeover b={active} />}
-        {active.kind === "warning" && <WarningTakeover b={active} />}
+      {/* Always-visible close — works no matter how long the content is */}
+      <button
+        type="button"
+        onClick={dismiss}
+        className="fixed top-4 right-4 z-[101] w-11 h-11 flex items-center justify-center border"
+        style={{
+          borderColor: "rgba(245,245,245,0.4)",
+          color: "#f5f5f5",
+          background: "rgba(0,20,40,0.85)",
+        }}
+        aria-label="Dismiss"
+      >
+        <span style={{ fontSize: "18px", lineHeight: 1 }}>✕</span>
+      </button>
 
-        <button
-          type="button"
-          onClick={dismiss}
-          className="mt-10 px-8 py-4 border label text-[10px]"
-          style={{
-            borderColor: "rgba(245,245,245,0.4)",
-            color: "#f5f5f5",
-            background: "transparent",
-            minHeight: "48px",
-          }}
-        >
-          {active.kind === "warning" ? "Done" : "Got it"}
-        </button>
+      <div className="min-h-full flex items-center justify-center px-6 py-16">
+        <div className="w-full max-w-[420px] text-center">
+          {active.kind === "go" && <GoTakeover b={active} />}
+          {active.kind === "notice" && <NoticeTakeover b={active} />}
+          {active.kind === "video" && <VideoTakeover b={active} />}
+          {active.kind === "warning" && <WarningTakeover b={active} />}
+
+          <button
+            type="button"
+            onClick={dismiss}
+            className="mt-10 px-8 py-4 border label text-[10px]"
+            style={{
+              borderColor: "rgba(245,245,245,0.4)",
+              color: "#f5f5f5",
+              background: "transparent",
+              minHeight: "48px",
+            }}
+          >
+            {active.kind === "warning" ? "Done" : "Got it"}
+          </button>
+        </div>
       </div>
     </div>
   );
