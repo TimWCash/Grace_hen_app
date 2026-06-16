@@ -133,6 +133,29 @@ export default function MorePage() {
         </ol>
       </Ink>
 
+      {/* Add to home screen */}
+      <Ink delay={0.1}>
+        <section className="border-t py-8" style={{ borderColor: "var(--color-rule)" }}>
+          <p className="label text-[10px]" style={{ color: "var(--color-gold)" }}>
+            Add to Home Screen
+          </p>
+          <p
+            className="font-display italic mt-2"
+            style={{ color: "var(--color-navy)", opacity: 0.65, fontSize: "14px" }}
+          >
+            Pop it on your phone like an app — and get the alerts.
+          </p>
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new Event("open-install-guide"))}
+            className="mt-4 w-full label text-[10px] py-3.5 border"
+            style={{ borderColor: "var(--color-navy)", color: "var(--color-navy)", minHeight: "48px" }}
+          >
+            Show me how
+          </button>
+        </section>
+      </Ink>
+
       {/* Night mode */}
       <Ink delay={0.12}>
         <section className="border-t py-8" style={{ borderColor: "var(--color-rule)" }}>
