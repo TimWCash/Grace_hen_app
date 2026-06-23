@@ -381,7 +381,7 @@ export default function AdminPage() {
 
       {/* LUNCH ORDERS */}
       {lunchMenu.length > 0 && (
-        <Section label="Lunch Orders · The House">
+        <Section label="Lunch Orders · House">
           {(["starter", "main", "dessert"] as const).map((course) => {
             const t = lunchTallies[course];
             const entries = t ? Object.entries(t) : [];

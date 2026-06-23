@@ -39,7 +39,7 @@ create table public.event_config (
   id              integer primary key default 1,
   passcode        text not null,
   admin_pin       text not null,
-  reveal_at       timestamptz not null default '2026-07-11T14:00:00+01:00',
+  reveal_at       timestamptz not null default '2026-06-28T10:00:00+01:00',
   constraint singleton check (id = 1)
 );
 
@@ -324,7 +324,7 @@ on conflict (id) do update
 
 -- Real programme — Saturday 27 June 2026, Dublin. Dress: black.
 insert into public.stops (position, time_label, title, venue, address, drink, note) values
-  (1, '14:15', 'Lunch at the House', 'The House', null, null, 'Meet at 2:15 for lunch before the off. Dress in black — sleek and bold.'),
+  (1, '14:15', 'Lunch at House', 'House', null, null, 'Meet at 2:15 for lunch before the off. Dress in black — sleek and bold.'),
   (2, '17:00', 'Pen & Player',       'Pen & Player', null, null, 'Cocktails poured for a glamorous bunch. The night begins in earnest.'),
   (3, '18:00', 'The Landmark',       'Landmark', null, null, 'Cards on the table, a martini in hand.'),
   (4, '21:30', 'Karaoke',            'Maneki', null, null, 'Karaoke til close. Everyone owes Grace one song.');

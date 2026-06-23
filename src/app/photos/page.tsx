@@ -118,7 +118,7 @@ export default function PhotosPage() {
       sectionMark="III"
       eyebrow="Captured · Sealed · Revealed"
       title="The Trophy Room"
-      subtitle="Every photo from the night, kept in the dark until the wedding."
+      subtitle="Every photo from the night, kept in the dark until the morning after."
     >
       {/* Sealed vault card (intentionally dark; flips with night mode tokens) */}
       <div
@@ -129,7 +129,7 @@ export default function PhotosPage() {
           {locked ? "Develops On" : "Now Revealed"}
         </p>
         <p className="font-display mt-3" style={{ color: "var(--color-paper)", fontSize: "30px", letterSpacing: "-0.02em" }}>
-          11 July 2026
+          28 June 2026
         </p>
         <div className="mx-auto my-6 w-12" style={{ height: "0.5px", background: "var(--color-rule-gold)" }} />
 
@@ -151,7 +151,7 @@ export default function PhotosPage() {
               className="font-display italic mt-6"
               style={{ color: "var(--color-paper)", opacity: 0.85, fontSize: "15px", lineHeight: 1.5 }}
             >
-              Snap as much as you like. No one sees a thing until the wedding day.
+              Snap as much as you like. No one sees a thing until the morning after.
             </p>
             <div className="mt-6 grid grid-cols-4 gap-0 border-t border-b" style={{ borderColor: "var(--color-rule-gold)" }}>
               {[

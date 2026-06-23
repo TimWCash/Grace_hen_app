@@ -9,7 +9,7 @@
 -- the `note` column). Overrides 003's generic seed.
 --
 -- Mapping (evidence-based; confirmed with Tim):
---   The House     = lunch venue → light drinks here; FOOD pre-order
+--   House         = lunch venue → light drinks here; FOOD pre-order
 --                   is a separate feature (the set-lunch PDF).
 --   Pen & Player  = theatrical "Repertoire & Review" cocktails.
 --   The Landmark  = "Trace of the Rebel" cocktail menu.
@@ -79,7 +79,7 @@ join (values
 ) as x(pos, label, note) on true
 where s.venue = 'Maneki';
 
--- ─── THE HOUSE (lunch — drinks only; food handled separately) ─
+-- ─── HOUSE (lunch — drinks only; food handled separately) ─
 insert into public.stop_menus (stop_id, position, label, note)
 select s.id, x.pos, x.label, x.note
 from public.stops s
@@ -89,4 +89,4 @@ join (values
   (3, 'Glass of red / white', null),
   (4, 'Something soft (0%)', null)
 ) as x(pos, label, note) on true
-where s.venue = 'The House';
+where s.venue = 'House';

@@ -8,7 +8,7 @@
 -- if you want drink menus attached to the new stops).
 --
 -- Real programme — Saturday 27 June 2026, Dublin. Dress: black.
---   2:15pm  Lunch at the house
+--   2:15pm  Lunch at House (Lower Leeson St)
 --   5:00pm  Pen & Player
 --   6:00pm  Landmark
 --   9:30pm  Karaoke at Maneki
@@ -19,7 +19,7 @@
 -- ─── STOPS ───────────────────────────────────────────────────
 delete from public.stops;  -- cascades to drink_orders / stop_menus
 insert into public.stops (position, time_label, title, venue, address, drink, note) values
-  (1, '14:15', 'Lunch at the House', 'The House', null, null,
+  (1, '14:15', 'Lunch at House', 'House', null, null,
      'Meet at 2:15 for lunch before the off. Dress in black — sleek and bold.'),
   (2, '17:00', 'Pen & Player',       'Pen & Player', null, null,
      'Cocktails poured for a glamorous bunch. The night begins in earnest.'),

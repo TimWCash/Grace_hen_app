@@ -8,10 +8,11 @@ import { Ink } from "@/components/Ink";
 const SECTIONS: { n: string; title: string; sub: string; href: string }[] = [
   { n: "I", title: "Lunch", sub: "Pre-order your courses", href: "/lunch" },
   { n: "II", title: "The Hens", sub: "The full roll call", href: "/guests" },
-  { n: "III", title: "The Salon", sub: "Mr & Mrs · scavenger · leaderboard", href: "/games" },
-  { n: "IV", title: "The Ballot", sub: "Every question of the night", href: "/polls" },
-  { n: "V", title: "The Map", sub: "Find your squad", href: "/map" },
-  { n: "VI", title: "Essentials", sub: "Dress · contacts · taxis · lost?", href: "/essentials" },
+  { n: "III", title: "Voice Notes", sub: "A favourite memory of Grace", href: "/memories" },
+  { n: "IV", title: "The Salon", sub: "Mr & Mrs · Guess Who · scavenger", href: "/games" },
+  { n: "V", title: "The Ballot", sub: "Every question of the night", href: "/polls" },
+  { n: "VI", title: "The Map", sub: "Find your squad", href: "/map" },
+  { n: "VII", title: "Essentials", sub: "Dress · contacts · taxis · lost?", href: "/essentials" },
 ];
 
 export default function MorePage() {
@@ -98,7 +99,7 @@ export default function MorePage() {
                   className="font-display italic tabular-nums w-8 shrink-0"
                   style={{ color: "var(--color-gold)", fontSize: "13px" }}
                 >
-                  VII.
+                  VIII.
                 </span>
                 <div className="flex-1">
                   <div

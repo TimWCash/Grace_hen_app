@@ -267,7 +267,7 @@ export default function ItineraryPage() {
                         <DetailRow label="Logistics">
                           {s.note ?? "—"}
                         </DetailRow>
-                        {s.venue === "The House" && (
+                        {s.venue === "House" && (
                           <Link
                             href="/lunch"
                             onClick={(e) => e.stopPropagation()}

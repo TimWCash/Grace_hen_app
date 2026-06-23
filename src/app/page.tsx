@@ -219,7 +219,7 @@ export default function HomePage() {
           <ol className="space-y-0">
             <TocLine n="I" title="The Program" sub="The night, stop by stop" href="/itinerary" />
             <TocLine n="II" title="Find My Squad" sub="Where everyone is, all night" href="/map" />
-            <TocLine n="III" title="The Trophy Room" sub="Develops 11 July" href="/photos" />
+            <TocLine n="III" title="The Trophy Room" sub="Develops 28 June" href="/photos" />
             <TocLine n="IV" title="The Hens" sub="Twelve women, one bride" href="/guests" />
             <TocLine n="V" title="The Salon" sub="Mr & Mrs · house games" href="/games" />
             <TocLine n="VI" title="The Ballot" sub="Decide the next stop" href="/polls" />

@@ -32,11 +32,11 @@ export const EVENT = {
 
   /** Core dates */
   dates: {
-    // Hen: Saturday 27 June 2026, lunch at the house at 2:15pm (IST = UTC+1).
+    // Hen: Saturday 27 June 2026, lunch at House at 2:15pm (IST = UTC+1).
     hen: new Date("2026-06-27T14:15:00+01:00"),
     wedding: new Date("2026-07-11T14:00:00+01:00"),
-    /** When sealed photos develop — defaults to wedding day at 14:00 */
-    photoReveal: new Date("2026-07-11T14:00:00+01:00"),
+    /** When sealed photos develop — the morning after the hen */
+    photoReveal: new Date("2026-06-28T10:00:00+01:00"),
   },
 
   /** City / map defaults */
@@ -73,7 +73,7 @@ export const EVENT = {
     dressCode: "Dress in black. Sleek and bold.",
     meetingPoint: {
       label: "Curtain up",
-      value: "The house — 2:15pm, lunch before the off",
+      value: "House, Lower Leeson St — 2:15pm, lunch before the off",
     },
     hotel: {
       label: "Base for the night",

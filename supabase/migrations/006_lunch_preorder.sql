@@ -1,7 +1,7 @@
 -- ============================================================
--- Migration 006 — Lunch pre-order (The House, 2:15pm)
+-- Migration 006 — Lunch pre-order (House, 2:15pm)
 --
--- The House serves a 3-course set lunch. For a group of ~20 the
+-- House serves a 3-course set lunch. For a group of ~20 the
 -- restaurant needs orders in advance, so each hen picks one
 -- starter + one main + one dessert, and Fiona sends the
 -- consolidated order. Different shape from the cocktail single-

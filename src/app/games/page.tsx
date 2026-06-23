@@ -20,9 +20,8 @@ type QuizAnswer = {
 };
 type Task = { id: string; position: number; task: string };
 type Completion = { task_id: string; guest_id: string };
-type LeaderRow = { guest_id: string; display_name: string; score: number; answered: number };
 
-type Tab = "quiz" | "hunt" | "board";
+type Tab = "quiz" | "hunt";
 
 export default function GamesPage() {
   const [tab, setTab] = useState<Tab>("quiz");
@@ -33,8 +32,6 @@ export default function GamesPage() {
 
   const [tasks, setTasks] = useState<Task[] | null>(null);
   const [completions, setCompletions] = useState<Set<string>>(new Set());
-
-  const [board, setBoard] = useState<LeaderRow[] | null>(null);
 
   useEffect(() => {
     const sb = supabase();
@@ -67,20 +64,6 @@ export default function GamesPage() {
     };
   }, []);
 
-  // Lazy-load the leaderboard when its tab opens.
-  useEffect(() => {
-    if (tab !== "board" || board !== null) return;
-    const sb = supabase();
-    let cancelled = false;
-    sb.rpc("quiz_leaderboard").then(({ data, error }) => {
-      if (cancelled) return;
-      setBoard(error ? [] : (data as LeaderRow[]));
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [tab, board]);
-
   const answer = async (qId: string, idx: number) => {
     if (!guestId) return;
     const sb = supabase();
@@ -98,7 +81,6 @@ export default function GamesPage() {
       ...prev,
       [qId]: { question_id: qId, guest_id: guestId, chosen_index: idx, is_correct: !!data },
     }));
-    setBoard(null); // invalidate cached leaderboard
   };
 
   const toggleTask = async (taskId: string) => {
@@ -125,7 +107,6 @@ export default function GamesPage() {
   const TABS: { key: Tab; label: string }[] = [
     { key: "quiz", label: "Mr & Mrs" },
     { key: "hunt", label: "Scavenger" },
-    { key: "board", label: "Standings" },
   ];
 
   return (
@@ -135,7 +116,7 @@ export default function GamesPage() {
       title="The Salon"
       subtitle="How well do you really know her?"
     >
-      <div className="grid grid-cols-3 gap-0 border-y mb-8" style={{ borderColor: "var(--color-rule)" }}>
+      <div className="grid grid-cols-2 gap-0 border-y mb-8" style={{ borderColor: "var(--color-rule)" }}>
         {TABS.map((t, i) => (
           <button
             key={t.key}
@@ -158,7 +139,6 @@ export default function GamesPage() {
         <QuizTab questions={questions} myAnswers={myAnswers} score={score} total={questions?.length ?? 0} onAnswer={answer} />
       )}
       {tab === "hunt" && <HuntTab tasks={tasks} done={completions} onToggle={toggleTask} />}
-      {tab === "board" && <BoardTab board={board} meId={guestId} />}
     </PageFrame>
   );
 }
@@ -373,62 +353,6 @@ function HuntTab({
         })}
       </ul>
     </>
-  );
-}
-
-function BoardTab({ board, meId }: { board: LeaderRow[] | null; meId: string | null }) {
-  if (board === null) return <SkeletonList n={5} h="h-12" />;
-  const ranked = board.filter((r) => r.answered > 0);
-  if (ranked.length === 0) {
-    return (
-      <p
-        className="font-display italic text-center py-12"
-        style={{ color: "var(--color-navy)", opacity: 0.5, fontSize: "16px" }}
-      >
-        No scores yet — be the first to play Mr &amp; Mrs.
-      </p>
-    );
-  }
-  return (
-    <ol className="space-y-0">
-      {ranked.map((r, i) => {
-        const mine = r.guest_id === meId;
-        return (
-          <li
-            key={r.guest_id}
-            className={`py-4 flex items-baseline justify-between ${i === 0 ? "" : "border-t"}`}
-            style={{ borderColor: "var(--color-rule)" }}
-          >
-            <div className="flex items-baseline gap-3 min-w-0">
-              <span
-                className="font-display italic tabular-nums shrink-0"
-                style={{ color: "var(--color-gold)", width: "24px", fontSize: "13px" }}
-              >
-                {i + 1}
-              </span>
-              <span
-                className="font-display truncate"
-                style={{ color: "var(--color-navy)", fontSize: "20px" }}
-              >
-                {r.display_name}
-                {mine && (
-                  <span className="label text-[8px] ml-2" style={{ color: "var(--color-gold)" }}>
-                    You
-                  </span>
-                )}
-              </span>
-            </div>
-            <span
-              className="font-display tabular-nums shrink-0"
-              style={{ color: "var(--color-navy)", fontSize: "18px" }}
-            >
-              {r.score}
-              <span style={{ opacity: 0.45, fontSize: "13px" }}>/{r.answered}</span>
-            </span>
-          </li>
-        );
-      })}
-    </ol>
   );
 }
 

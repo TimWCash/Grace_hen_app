@@ -19,7 +19,7 @@ export function project(lat: number, lng: number): { x: number; y: number } {
 // TODO(Tim): verify the real addresses for Pen & Player / Landmark /
 // Maneki and the house, then set precise lat/lng here.
 export const STOP_COORDS: Record<string, { lat: number; lng: number }> = {
-  "The House": { lat: 53.3382, lng: -6.2536 }, // TK — Grace's / the host's house
+  "House": { lat: 53.3346, lng: -6.2551 }, // House, Lower Leeson St — TK confirm
   "Pen & Player": { lat: 53.3392, lng: -6.2585 }, // TK
   "Landmark": { lat: 53.3405, lng: -6.2602 }, // TK
   "Maneki": { lat: 53.3439, lng: -6.2624 }, // TK

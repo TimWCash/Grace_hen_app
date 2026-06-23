@@ -79,7 +79,7 @@ export default function LunchPage() {
     return (
       <PageFrame
         sectionMark="Lunch"
-        eyebrow="The House · 2:15pm"
+        eyebrow="House · 2:15pm"
         title="Lunch"
         subtitle="Pre-ordering opens once the menu's loaded."
       >
@@ -98,7 +98,7 @@ export default function LunchPage() {
   return (
     <PageFrame
       sectionMark="Lunch"
-      eyebrow="The House · 2:15pm"
+      eyebrow="House · 2:15pm"
       title="Lunch, Pre-Ordered"
       subtitle="Pick a course each — Claire sends the order ahead so it's ready when we sit down."
     >
