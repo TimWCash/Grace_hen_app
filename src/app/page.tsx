@@ -109,57 +109,6 @@ export default function HomePage() {
       {/* ─── DAILY BRIEFING ───────────────────────────────────────────── */}
       <DailyBriefing />
 
-      {/* ─── SPREAD 03: A NOTE ────────────────────────────────────────── */}
-      <section
-        className="border-t"
-        style={{ borderColor: "var(--color-rule)" }}
-      >
-        <div className="mx-auto max-w-[640px] px-6 py-20">
-          <Ink delay={0.1}>
-            <p
-              className="label text-[10px] text-center"
-              style={{ color: "var(--color-gold)" }}
-            >
-              From the Concierge
-            </p>
-          </Ink>
-          <Ink delay={0.18}>
-            <div className="rule-gold mx-auto mt-3 w-8" />
-          </Ink>
-          <Ink delay={0.28}>
-            <h2
-              className="font-display mt-10 mx-auto text-center"
-              style={{
-                fontSize: "clamp(36px, 8vw, 56px)",
-                lineHeight: 0.96,
-                letterSpacing: "-0.03em",
-                fontWeight: 500,
-                color: "var(--color-ink)",
-                maxWidth: "16ch",
-              }}
-            >
-              Six bars, one bride.
-            </h2>
-          </Ink>
-          <Ink delay={0.42}>
-            <p
-              className="font-display italic mt-8 mx-auto text-center"
-              style={{
-                color: "var(--color-ink)",
-                opacity: 0.75,
-                fontSize: "18px",
-                lineHeight: 1.55,
-                maxWidth: "36ch",
-              }}
-            >
-              One Dublin evening before her name changes. Cocktails poured in
-              every room we know how to find. Photographs sealed and not yet
-              developed. We are toasting her — louder than is decent.
-            </p>
-          </Ink>
-        </div>
-      </section>
-
       {/* ─── SPREAD 04: MARK ──────────────────────────────────────────── */}
       <section
         className="border-t"
@@ -268,7 +217,7 @@ export default function HomePage() {
           </Ink>
 
           <ol className="space-y-0">
-            <TocLine n="I" title="The Program" sub="Six bars · the route" href="/itinerary" />
+            <TocLine n="I" title="The Program" sub="The night, stop by stop" href="/itinerary" />
             <TocLine n="II" title="Find My Squad" sub="Where everyone is, all night" href="/map" />
             <TocLine n="III" title="The Trophy Room" sub="Develops 11 July" href="/photos" />
             <TocLine n="IV" title="The Hens" sub="Twelve women, one bride" href="/guests" />

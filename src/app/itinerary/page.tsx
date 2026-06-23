@@ -98,7 +98,7 @@ export default function ItineraryPage() {
       sectionMark="I"
       eyebrow="Saturday · 27 June 2026"
       title="The Program"
-      subtitle="Six bars, in order. Tap any row to expand."
+      subtitle="The night, in order. Tap any row to expand."
     >
       {!stops ? (
         <Skeleton />
