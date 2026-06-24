@@ -8,6 +8,7 @@ import { NightModeProvider } from "@/components/NightMode";
 import { BroadcastListener } from "@/components/BroadcastListener";
 import { InstallGuide } from "@/components/InstallGuide";
 import { MemoryPrompt } from "@/components/MemoryPrompt";
+import { Celebration } from "@/components/Celebration";
 import { EVENT } from "@/config/event";
 
 const playfair = Playfair_Display({
@@ -63,6 +64,7 @@ export default function RootLayout({
             <main className="flex-1 pb-28">{children}</main>
             <InstallGuide />
             <MemoryPrompt />
+            <Celebration />
             <Nav />
           </AuthGate>
         </NightModeProvider>

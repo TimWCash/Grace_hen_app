@@ -9,6 +9,7 @@ import {
   postTextMemory,
   postVoiceMemory,
 } from "@/lib/memories";
+import { celebrate } from "@/lib/celebrate";
 
 type Phase = "idle" | "recording" | "preview" | "saving";
 
@@ -115,6 +116,7 @@ export function MemoryComposer({
   };
 
   const saved = () => {
+    celebrate();
     setFlash("Saved for Grace 💛");
     setTimeout(() => setFlash(null), 2500);
     onPosted?.();

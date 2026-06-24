@@ -5,6 +5,7 @@ import { PageFrame } from "@/components/PageFrame";
 import { PHOTO_REVEAL_DATE, countdownParts } from "@/lib/dates";
 import { supabase } from "@/lib/supabase";
 import { getCurrentGuest } from "@/lib/guest";
+import { celebrate } from "@/lib/celebrate";
 
 type RevealedPhoto = {
   id: string;
@@ -101,6 +102,7 @@ export default function PhotosPage() {
 
       setMyCount((c) => c + 1);
       setTotalCount((c) => c + 1);
+      celebrate();
       setFlash("Sealed in the album.");
       setTimeout(() => setFlash(null), 2500);
     } catch (err: unknown) {

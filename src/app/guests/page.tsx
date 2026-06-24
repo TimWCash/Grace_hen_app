@@ -6,6 +6,7 @@ import { Ink } from "@/components/Ink";
 import { HENS, type Hen } from "@/lib/hens";
 import { supabase } from "@/lib/supabase";
 import { getCurrentGuest } from "@/lib/guest";
+import { celebrate } from "@/lib/celebrate";
 import type { Guest } from "@/lib/supabase";
 
 type Profile = {
@@ -266,7 +267,10 @@ function ClaimCard({
     setBusy(false);
     setFlash(error ? "That name's already taken." : "Photo added ✓");
     setTimeout(() => setFlash(null), 2500);
-    if (!error) onSaved();
+    if (!error) {
+      celebrate();
+      onSaved();
+    }
     if (fileRef.current) fileRef.current.value = "";
   };
 
