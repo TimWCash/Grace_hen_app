@@ -533,7 +533,7 @@ export default function AdminPage() {
       </Section>
 
       {/* DEVELOP PHOTOS */}
-      <Section label="The Trophy Room">
+      <Section label="Photo Booth">
         <p
           className="font-display italic"
           style={{ color: "var(--color-navy)", opacity: 0.7, fontSize: "14px" }}

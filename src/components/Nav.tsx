@@ -12,7 +12,7 @@ const items: Item[] = [
   { href: "/", label: "Cover" },
   { href: "/tonight", label: "Tonight" },
   { href: "/itinerary", label: "Program" },
-  { href: "/photos", label: "Trophy" },
+  { href: "/photos", label: "Photos" },
   { href: "/more", label: "More" },
 ];
 

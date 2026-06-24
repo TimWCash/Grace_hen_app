@@ -119,7 +119,7 @@ export default function PhotosPage() {
     <PageFrame
       sectionMark="III"
       eyebrow="Captured · Sealed · Revealed"
-      title="The Trophy Room"
+      title="Photo Booth"
       subtitle="Every photo from the night, kept in the dark until the morning after."
     >
       {/* Sealed vault card (intentionally dark; flips with night mode tokens) */}
