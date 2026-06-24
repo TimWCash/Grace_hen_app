@@ -27,6 +27,7 @@ export function MemoryPrompt() {
     const t = setTimeout(async () => {
       const guest = await getCurrentGuest();
       if (cancelled || !guest) return;
+      if (guest.is_bride) return; // never nag the bride — it's her surprise
       setGuestId(guest.id);
       const has = await guestHasMemory(guest.id);
       if (!cancelled && has === false) setOpen(true);

@@ -34,10 +34,20 @@ create index if not exists voice_notes_created_idx
 
 alter table public.voice_notes enable row level security;
 
--- Anyone signed in can read everyone's memories.
+-- Is the current guest the bride? (mirrors is_admin) — used to keep the
+-- memories a surprise: Grace can't read them.
+create or replace function public.is_bride()
+returns boolean
+language sql stable security definer set search_path = ''
+as $$
+  select coalesce((select is_bride from public.guests where id = auth.uid()), false);
+$$;
+grant execute on function public.is_bride() to anon, authenticated;
+
+-- Everyone signed in can read the memories — EXCEPT Grace (it's a surprise).
 drop policy if exists "voice_notes readable" on public.voice_notes;
 create policy "voice_notes readable" on public.voice_notes
-  for select to authenticated using (true);
+  for select to authenticated using (not public.is_bride());
 
 -- You can only post as yourself.
 drop policy if exists "voice_notes insert self" on public.voice_notes;

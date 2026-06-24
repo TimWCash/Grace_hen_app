@@ -9,6 +9,7 @@ import { ago, clock, type Memory } from "@/lib/memories";
 
 export default function MemoriesPage() {
   const [guestId, setGuestId] = useState<string | null>(null);
+  const [isBride, setIsBride] = useState(false);
   const [notes, setNotes] = useState<Memory[] | null>(null);
   const [unavailable, setUnavailable] = useState(false);
 
@@ -40,6 +41,11 @@ export default function MemoriesPage() {
       const guest = await getCurrentGuest();
       if (cancelled) return;
       setGuestId(guest?.id ?? null);
+      setIsBride(!!guest?.is_bride);
+      if (guest?.is_bride) {
+        setNotes([]); // the surprise stays sealed for Grace
+        return;
+      }
       await load();
     })();
 
@@ -56,6 +62,32 @@ export default function MemoriesPage() {
   }, [load]);
 
   const myCount = notes && guestId ? notes.filter((n) => n.guest_id === guestId).length : 0;
+
+  if (isBride) {
+    return (
+      <PageFrame
+        sectionMark="Memories"
+        eyebrow="No peeking, Grace"
+        title="Grace Stories"
+        subtitle="This one's a surprise."
+      >
+        <div
+          className="border p-8 text-center"
+          style={{ borderColor: "var(--color-rule-gold)", background: "var(--color-navy)" }}
+        >
+          <p className="label text-[10px]" style={{ color: "var(--color-gold-soft)" }}>
+            Sealed for you
+          </p>
+          <p
+            className="font-display italic mt-4 mx-auto"
+            style={{ color: "var(--color-paper)", fontSize: "18px", lineHeight: 1.55, maxWidth: "28ch" }}
+          >
+            Your girls are leaving you their favourite memories of you. You&apos;ll get to read and hear them — but not yet. 💛
+          </p>
+        </div>
+      </PageFrame>
+    );
+  }
 
   return (
     <PageFrame
