@@ -369,13 +369,13 @@ function InlineBallot() {
       ...prev.filter((v) => v.guest_id !== guest.id),
       { poll_id: poll.id, guest_id: guest.id, option_id: optionId },
     ]);
-    await sb
+    const { error } = await sb
       .from("poll_votes")
       .upsert(
         { poll_id: poll.id, guest_id: guest.id, option_id: optionId },
         { onConflict: "poll_id,guest_id" },
       );
-    celebrate();
+    if (!error) celebrate();
   };
 
   return (

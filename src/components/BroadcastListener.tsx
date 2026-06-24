@@ -347,11 +347,11 @@ function WarningTakeover({ b }: { b: Broadcast }) {
     setSaving(true);
     setOrdered(optionId);
     const sb = supabase();
-    await sb.from("drink_orders").upsert(
+    const { error } = await sb.from("drink_orders").upsert(
       { stop_id: b.payload.stopId, guest_id: guestId, option_id: optionId },
       { onConflict: "stop_id,guest_id" },
     );
-    celebrate();
+    if (!error) celebrate();
     setSaving(false);
   };
 

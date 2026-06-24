@@ -6,12 +6,14 @@ import { getCurrentGuest } from "@/lib/guest";
 import { guestHasMemory } from "@/lib/memories";
 
 const SNOOZE_KEY = "memory-prompt-snoozed"; // sessionStorage — clears on next app open
-const INSTALL_SEEN = "install-guide-seen"; // don't stack on the first-run install guide
+const INSTALL_SNOOZE = "install-snoozed"; // the install guide's session-snooze flag
+const INSTALL_DONE_EVENT = "install-flow-done"; // fired when the install guide steps aside
 
 /**
  * On app open, ask each hen for her favourite Grace story (voice or text).
  * Shows until she's left one; "Maybe later" snoozes for the session.
  * Reads the guest directly (not via context) so it's safe on public routes.
+ * Waits for the install guide to resolve so the two popups never stack.
  */
 export function MemoryPrompt() {
   const [open, setOpen] = useState(false);
@@ -20,21 +22,43 @@ export function MemoryPrompt() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (!localStorage.getItem(INSTALL_SEEN)) return; // first run = install guide's turn
     if (sessionStorage.getItem(SNOOZE_KEY)) return;
 
     let cancelled = false;
-    const t = setTimeout(async () => {
-      const guest = await getCurrentGuest();
-      if (cancelled || !guest) return;
-      if (guest.is_bride) return; // never nag the bride — it's her surprise
-      setGuestId(guest.id);
-      const has = await guestHasMemory(guest.id);
-      if (!cancelled && has === false) setOpen(true);
-    }, 1200);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    const runCheck = () => {
+      timer = setTimeout(async () => {
+        const guest = await getCurrentGuest();
+        if (cancelled || !guest) return;
+        if (guest.is_bride) return; // never nag the bride — it's her surprise
+        setGuestId(guest.id);
+        const has = await guestHasMemory(guest.id);
+        if (!cancelled && has === false) setOpen(true);
+      }, 1200);
+    };
+
+    const installed =
+      window.matchMedia?.("(display-mode: standalone)").matches ||
+      (window.navigator as unknown as { standalone?: boolean }).standalone === true;
+    // Go ahead if the install guide isn't going to show; otherwise wait for it.
+    if (installed || sessionStorage.getItem(INSTALL_SNOOZE)) {
+      runCheck();
+      return () => {
+        cancelled = true;
+        if (timer) clearTimeout(timer);
+      };
+    }
+
+    const onDone = () => {
+      window.removeEventListener(INSTALL_DONE_EVENT, onDone);
+      if (!cancelled) runCheck();
+    };
+    window.addEventListener(INSTALL_DONE_EVENT, onDone);
     return () => {
       cancelled = true;
-      clearTimeout(t);
+      if (timer) clearTimeout(timer);
+      window.removeEventListener(INSTALL_DONE_EVENT, onDone);
     };
   }, []);
 

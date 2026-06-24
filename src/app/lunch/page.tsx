@@ -67,13 +67,13 @@ export default function LunchPage() {
     setSaving(course);
     setPicks((p) => ({ ...p, [course]: itemId }));
     const sb = supabase();
-    await sb
+    const { error } = await sb
       .from("lunch_orders")
       .upsert(
         { guest_id: guest.id, course, item_id: itemId },
         { onConflict: "guest_id,course" },
       );
-    celebrate();
+    if (!error) celebrate();
     setSaving(null);
   };
 

@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 
 type BIPEvent = Event & { prompt: () => Promise<void> };
 
-const SEEN_KEY = "install-guide-seen";
+// Snooze for the current browser session only — so the nudge reappears on
+// every fresh app open and STOPS only once the app is actually installed.
+const SNOOZE_KEY = "install-snoozed";
+// Tells MemoryPrompt the install flow is done, so the two popups never stack.
+const DONE_EVENT = "install-flow-done";
 
 type Platform =
   | "installed"
@@ -82,9 +86,13 @@ export function InstallGuide() {
     };
     window.addEventListener("beforeinstallprompt", onBIP);
 
-    // Auto-open once, unless already installed or seen before.
-    if (d.platform !== "installed" && !localStorage.getItem(SEEN_KEY)) {
+    // Keep nudging until the app is genuinely installed. Show once per
+    // browser session when not installed; once installed, never again.
+    if (d.platform !== "installed" && !sessionStorage.getItem(SNOOZE_KEY)) {
       setOpen(true);
+    } else {
+      // Nothing to show → let the memory prompt take its turn.
+      window.dispatchEvent(new Event(DONE_EVENT));
     }
 
     const onOpen = () => setOpen(true);
@@ -97,8 +105,11 @@ export function InstallGuide() {
 
   if (!open) return null;
 
-  const close = (markSeen: boolean) => {
-    if (markSeen) localStorage.setItem(SEEN_KEY, "1");
+  const close = () => {
+    try {
+      sessionStorage.setItem(SNOOZE_KEY, "1");
+    } catch {}
+    window.dispatchEvent(new Event(DONE_EVENT));
     setOpen(false);
   };
 
@@ -132,20 +143,20 @@ export function InstallGuide() {
 
           <div className="rule-gold w-12 my-5" />
 
-          <Steps platform={info.platform} inAppName={info.inAppName} bip={bip} onInstalled={() => close(true)} />
+          <Steps platform={info.platform} inAppName={info.inAppName} bip={bip} onInstalled={close} />
 
           <div className="mt-7 flex gap-2">
             <button
               type="button"
-              onClick={() => close(false)}
+              onClick={close}
               className="flex-1 border py-3 label text-[9px]"
               style={{ borderColor: "var(--color-rule)", color: "var(--color-navy)", minHeight: "44px" }}
             >
-              Later
+              Not now
             </button>
             <button
               type="button"
-              onClick={() => close(true)}
+              onClick={close}
               className="flex-1 py-3 label text-[9px]"
               style={{ background: "var(--color-navy)", color: "var(--color-paper)", border: "0.5px solid var(--color-navy)", minHeight: "44px" }}
             >
