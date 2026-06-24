@@ -25,12 +25,15 @@ const COLORS: Record<"gold" | "navy" | "chalk", string> = {
 // Drop the photos in /public/photos/mark/ as mark-1.jpg … mark-5.jpg; any
 // that aren't there yet are simply skipped (onError), so this is safe early.
 const MARK_FACES = [
-  "/photos/mark-angel.jpg",
   "/photos/mark/mark-1.jpg",
   "/photos/mark/mark-2.jpg",
   "/photos/mark/mark-3.jpg",
   "/photos/mark/mark-4.jpg",
   "/photos/mark/mark-5.jpg",
+  "/photos/mark/mark-6.jpg",
+  "/photos/mark/mark-7.jpg",
+  "/photos/mark/mark-8.jpg",
+  "/photos/mark/mark-9.jpg",
 ];
 
 let _seq = 0;
@@ -101,7 +104,7 @@ export function Celebration() {
               src={p.face}
               alt=""
               className="w-full h-full object-cover rounded-full"
-              style={{ objectPosition: "center 25%", border: "1px solid #C5A059" }}
+              style={{ objectPosition: "center 42%", border: "1px solid #C5A059" }}
               draggable={false}
               onError={(e) => {
                 // Photo not added yet → hide this head rather than show a broken tile.
