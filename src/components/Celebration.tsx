@@ -106,7 +106,11 @@ export function Celebration() {
               src={p.face}
               alt=""
               className="w-full h-full object-cover rounded-full"
-              style={{ objectPosition: "center 42%", border: "1px solid #C5A059" }}
+              style={{
+                objectPosition: "center 42%",
+                border: "1.5px solid #C5A059",
+                boxShadow: "0 1px 4px rgba(0,20,40,0.18)",
+              }}
               draggable={false}
               onError={(e) => {
                 // Photo not added yet → hide this head rather than show a broken tile.
