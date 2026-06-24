@@ -322,9 +322,9 @@ insert into public.event_config (id, passcode, admin_pin) values
 on conflict (id) do update
   set passcode = excluded.passcode, admin_pin = excluded.admin_pin;
 
--- Real programme — Saturday 27 June 2026, Dublin. Dress: black.
+-- Real programme — Saturday 27 June 2026, Dublin.
 insert into public.stops (position, time_label, title, venue, address, drink, note) values
-  (1, '14:15', 'Lunch at House', 'House', null, null, 'Meet at 2:15 for lunch before the off. Dress in black — sleek and bold.'),
+  (1, '14:15', 'Lunch at House', 'House', null, null, 'Meet at 2:15 for lunch before the off.'),
   (2, '17:00', 'Pen & Player',       'Pen & Player', null, null, 'Cocktails poured for a glamorous bunch. The night begins in earnest.'),
   (3, '18:00', 'The Landmark',       'Landmark', null, null, 'Cards on the table, a martini in hand.'),
   (4, '21:30', 'Karaoke',            'Maneki', null, null, 'Karaoke til close. Everyone owes Grace one song.');

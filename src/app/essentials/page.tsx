@@ -8,9 +8,8 @@ export default function EssentialsPage() {
       sectionMark="V"
       eyebrow="Everything you need"
       title="Essentials"
-      subtitle="Dress, meeting point, contacts, taxis — and what to do if you lose the group."
+      subtitle="Meeting point, contacts, taxis — and what to do if you lose the group."
     >
-      <Row label="Dress">{e.dressCode}</Row>
       <Row label={e.meetingPoint.label}>{e.meetingPoint.value}</Row>
 
       <Block label="Who to call">

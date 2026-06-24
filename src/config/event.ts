@@ -70,7 +70,6 @@ export const EVENT = {
 
   /** Essentials — logistics shown on /essentials. TK fields await Tim. */
   essentials: {
-    dressCode: "Dress in black. Sleek and bold.",
     meetingPoint: {
       label: "Curtain up",
       value: "House, Lower Leeson St — 2:15pm, lunch before the off",

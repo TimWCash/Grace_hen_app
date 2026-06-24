@@ -261,9 +261,6 @@ export default function ItineraryPage() {
                             {s.drink ?? "Bartender's choice"}
                           </span>
                         </DetailRow>
-                        <DetailRow label="Dress">
-                          Dress in black. Sleek and bold.
-                        </DetailRow>
                         <DetailRow label="Logistics">
                           {s.note ?? "—"}
                         </DetailRow>

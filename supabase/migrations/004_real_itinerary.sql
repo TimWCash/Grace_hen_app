@@ -7,7 +7,7 @@
 -- stops that already have menus; re-run 003's seed block after this
 -- if you want drink menus attached to the new stops).
 --
--- Real programme — Saturday 27 June 2026, Dublin. Dress: black.
+-- Real programme — Saturday 27 June 2026, Dublin.
 --   2:15pm  Lunch at House (Lower Leeson St)
 --   5:00pm  Pen & Player
 --   6:00pm  Landmark
@@ -20,7 +20,7 @@
 delete from public.stops;  -- cascades to drink_orders / stop_menus
 insert into public.stops (position, time_label, title, venue, address, drink, note) values
   (1, '14:15', 'Lunch at House', 'House', null, null,
-     'Meet at 2:15 for lunch before the off. Dress in black — sleek and bold.'),
+     'Meet at 2:15 for lunch before the off.'),
   (2, '17:00', 'Pen & Player',       'Pen & Player', null, null,
      'Cocktails poured for a glamorous bunch. The night begins in earnest.'),
   (3, '18:00', 'The Landmark',       'Landmark', null, null,
