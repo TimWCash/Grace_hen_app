@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { PageFrame } from "@/components/PageFrame";
 import { supabase } from "@/lib/supabase";
+import { celebrate } from "@/lib/celebrate";
 import { useGuest } from "@/components/GuestProvider";
 
 type Course = "starter" | "main" | "dessert";
@@ -72,6 +73,7 @@ export default function LunchPage() {
         { guest_id: guest.id, course, item_id: itemId },
         { onConflict: "guest_id,course" },
       );
+    celebrate();
     setSaving(null);
   };
 

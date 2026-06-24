@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { celebrate } from "@/lib/celebrate";
 import { getCurrentGuest } from "@/lib/guest";
 import { fireAlert } from "@/lib/alerts";
 import { Ink } from "./Ink";
@@ -350,6 +351,7 @@ function WarningTakeover({ b }: { b: Broadcast }) {
       { stop_id: b.payload.stopId, guest_id: guestId, option_id: optionId },
       { onConflict: "stop_id,guest_id" },
     );
+    celebrate();
     setSaving(false);
   };
 

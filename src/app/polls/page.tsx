@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { PageFrame } from "@/components/PageFrame";
 import { supabase } from "@/lib/supabase";
+import { celebrate } from "@/lib/celebrate";
 import { getCurrentGuest } from "@/lib/guest";
 import { useGuest } from "@/components/GuestProvider";
 
@@ -106,6 +107,7 @@ export default function PollsPage() {
       .from("poll_votes")
       .upsert({ poll_id: pollId, guest_id: guestId, option_id: optionId }, { onConflict: "poll_id,guest_id" });
     if (error) console.error("vote", error);
+    else celebrate();
   };
 
   return (

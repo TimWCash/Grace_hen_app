@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { celebrate } from "@/lib/celebrate";
 import { useGuest } from "@/components/GuestProvider";
 import { MissionBlock } from "@/components/Mission";
 import { AlertsPrimer } from "@/components/AlertsPrimer";
@@ -374,6 +375,7 @@ function InlineBallot() {
         { poll_id: poll.id, guest_id: guest.id, option_id: optionId },
         { onConflict: "poll_id,guest_id" },
       );
+    celebrate();
   };
 
   return (
