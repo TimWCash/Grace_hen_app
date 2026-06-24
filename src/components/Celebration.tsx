@@ -48,11 +48,13 @@ function buildPieces(): Piece[] {
     return {
       kind,
       x: r(2, 98),
-      drift: r(-90, 90),
-      spin: r(360, 1080) * (Math.random() < 0.5 ? -1 : 1),
-      dur: r(1.7, 2.6),
-      delay: r(0, 0.45),
-      size: isMark ? r(30, 46) : r(7, 14),
+      drift: isMark ? r(-45, 45) : r(-80, 80),
+      // Faces barely rotate so you can actually see it's Mark; bits spin freely.
+      spin: isMark ? r(-18, 18) : r(360, 900) * (Math.random() < 0.5 ? -1 : 1),
+      // Faces fall slower and are bigger; confetti is a touch calmer too.
+      dur: isMark ? r(3.8, 5.2) : r(2.8, 3.8),
+      delay: r(0, 0.6),
+      size: isMark ? r(48, 70) : r(7, 14),
       square: Math.random() < 0.5,
       face: pick(MARK_FACES),
     };
@@ -72,7 +74,7 @@ export function Celebration() {
       try {
         navigator.vibrate?.([0, 25, 35, 25]);
       } catch {}
-      setTimeout(() => setBurst((b) => (b?.id === id ? null : b)), 3200);
+      setTimeout(() => setBurst((b) => (b?.id === id ? null : b)), 6500);
     };
     window.addEventListener(CELEBRATE_EVENT, onFire);
     return () => window.removeEventListener(CELEBRATE_EVENT, onFire);

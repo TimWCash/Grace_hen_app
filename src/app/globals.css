@@ -186,7 +186,10 @@ h1, h2, h3, h4, h5, h6,
     transform: translate3d(0, -14vh, 0) rotate(0deg);
     opacity: 0;
   }
-  8% {
+  6% {
+    opacity: 1;
+  }
+  85% {
     opacity: 1;
   }
   100% {
