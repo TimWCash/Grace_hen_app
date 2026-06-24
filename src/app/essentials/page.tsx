@@ -12,7 +12,6 @@ export default function EssentialsPage() {
     >
       <Row label="Dress">{e.dressCode}</Row>
       <Row label={e.meetingPoint.label}>{e.meetingPoint.value}</Row>
-      <Row label={e.hotel.label}>{e.hotel.value}</Row>
 
       <Block label="Who to call">
         {e.contacts.map((c) => (

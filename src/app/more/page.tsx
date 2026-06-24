@@ -9,7 +9,7 @@ const SECTIONS: { n: string; title: string; sub: string; href: string }[] = [
   { n: "I", title: "Lunch", sub: "Pre-order your courses", href: "/lunch" },
   { n: "II", title: "The Hens", sub: "The full roll call", href: "/guests" },
   { n: "III", title: "Voice Notes", sub: "A favourite memory of Grace", href: "/memories" },
-  { n: "IV", title: "The Salon", sub: "Mr & Mrs · Guess Who · scavenger", href: "/games" },
+  { n: "IV", title: "The Salon", sub: "Mr & Mrs · Guess Who", href: "/games" },
   { n: "V", title: "The Ballot", sub: "Every question of the night", href: "/polls" },
   { n: "VI", title: "The Map", sub: "Find your squad", href: "/map" },
   { n: "VII", title: "Essentials", sub: "Dress · contacts · taxis · lost?", href: "/essentials" },

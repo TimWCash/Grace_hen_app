@@ -1,27 +1,40 @@
 -- ============================================================
--- Migration 010 — Voice notes ("a favourite Grace memory")
+-- Migration 010 — Favourite-Grace-memory notes (voice OR text)
 --
--- Each hen records (or uploads) a short voice note of her favourite
--- memory of Grace. They play back on /memories as a shared wall —
--- a keepsake Grace can replay forever. Audio lives in a public
--- `voicenotes` bucket; each guest can only write her own folder.
+-- Each hen leaves a favourite memory of Grace: either a short
+-- voice note OR a typed note (<=200 chars). They play / read back
+-- on /memories as a shared wall — a keepsake Grace keeps forever.
+-- Audio lives in a public `voicenotes` bucket (own folder only).
 --
--- Paste into the Supabase SQL Editor and Run. Safe to re-run.
+-- Fully idempotent — safe to run on a fresh DB or to upgrade an
+-- earlier (voice-only) version of this table. Paste & Run.
 -- ============================================================
 
 create table if not exists public.voice_notes (
   id            uuid primary key default gen_random_uuid(),
   guest_id      uuid not null references public.guests(id) on delete cascade,
-  storage_path  text not null,                 -- path in the 'voicenotes' bucket
-  duration_secs numeric,                        -- length, for the UI
+  storage_path  text,                          -- audio path (null for a text note)
+  body          text,                          -- typed memory, <=200 chars (null for voice)
+  duration_secs numeric,
   created_at    timestamptz not null default now()
 );
+
+-- Bring an earlier voice-only install up to the voice-or-text shape.
+alter table public.voice_notes add column if not exists body text;
+alter table public.voice_notes alter column storage_path drop not null;
+alter table public.voice_notes drop constraint if exists voice_notes_has_content;
+alter table public.voice_notes add constraint voice_notes_has_content
+  check (storage_path is not null or (body is not null and btrim(body) <> ''));
+alter table public.voice_notes drop constraint if exists voice_notes_body_len;
+alter table public.voice_notes add constraint voice_notes_body_len
+  check (body is null or length(body) <= 200);
+
 create index if not exists voice_notes_created_idx
   on public.voice_notes (created_at desc);
 
 alter table public.voice_notes enable row level security;
 
--- Anyone signed in can hear everyone's memories.
+-- Anyone signed in can read everyone's memories.
 drop policy if exists "voice_notes readable" on public.voice_notes;
 create policy "voice_notes readable" on public.voice_notes
   for select to authenticated using (true);

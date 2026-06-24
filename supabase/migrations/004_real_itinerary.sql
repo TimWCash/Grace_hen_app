@@ -43,7 +43,7 @@ from p
 join (values
   ('First cocktail at Pen & Player?', 1, 'Espresso Martini'),
   ('First cocktail at Pen & Player?', 2, 'Negroni'),
-  ('First cocktail at Pen & Player?', 3, 'Champagne, obviously'),
+  ('First cocktail at Pen & Player?', 3, 'Prosecco, obviously'),
   ('Grace''s opening karaoke number?', 1, 'Total Eclipse of the Heart'),
   ('Grace''s opening karaoke number?', 2, 'Mr Brightside'),
   ('Grace''s opening karaoke number?', 3, 'Something by Beyoncé'),

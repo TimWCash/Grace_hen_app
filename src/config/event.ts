@@ -75,10 +75,6 @@ export const EVENT = {
       label: "Curtain up",
       value: "House, Lower Leeson St — 2:15pm, lunch before the off",
     },
-    hotel: {
-      label: "Base for the night",
-      value: "[Address TK — ask Claire]",
-    },
     contacts: [
       {
         name: "Claire Canning",

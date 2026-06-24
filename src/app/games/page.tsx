@@ -18,20 +18,11 @@ type QuizAnswer = {
   chosen_index: number;
   is_correct: boolean | null; // null = checking
 };
-type Task = { id: string; position: number; task: string };
-type Completion = { task_id: string; guest_id: string };
-
-type Tab = "quiz" | "hunt";
-
 export default function GamesPage() {
-  const [tab, setTab] = useState<Tab>("quiz");
   const [guestId, setGuestId] = useState<string | null>(null);
 
   const [questions, setQuestions] = useState<QuizQ[] | null>(null);
   const [myAnswers, setMyAnswers] = useState<Record<string, QuizAnswer>>({});
-
-  const [tasks, setTasks] = useState<Task[] | null>(null);
-  const [completions, setCompletions] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const sb = supabase();
@@ -43,11 +34,9 @@ export default function GamesPage() {
       setGuestId(guest?.id ?? null);
       if (!guest) return;
 
-      const [qRes, aRes, tRes, cRes] = await Promise.all([
+      const [qRes, aRes] = await Promise.all([
         sb.from("quiz_public").select("*").order("position", { ascending: true }),
         sb.from("quiz_answers").select("*").eq("guest_id", guest.id),
-        sb.from("scavenger_tasks").select("*").order("position", { ascending: true }),
-        sb.from("scavenger_completions").select("*").eq("guest_id", guest.id),
       ]);
       if (cancelled) return;
       if (qRes.data) setQuestions(qRes.data as QuizQ[]);
@@ -55,8 +44,6 @@ export default function GamesPage() {
         setMyAnswers(
           Object.fromEntries((aRes.data as QuizAnswer[]).map((a) => [a.question_id, a])),
         );
-      if (tRes.data) setTasks(tRes.data as Task[]);
-      if (cRes.data) setCompletions(new Set((cRes.data as Completion[]).map((c) => c.task_id)));
     };
     load();
     return () => {
@@ -83,31 +70,9 @@ export default function GamesPage() {
     }));
   };
 
-  const toggleTask = async (taskId: string) => {
-    if (!guestId) return;
-    const sb = supabase();
-    const isDone = completions.has(taskId);
-    setCompletions((s) => {
-      const next = new Set(s);
-      if (isDone) next.delete(taskId);
-      else next.add(taskId);
-      return next;
-    });
-    if (isDone) {
-      await sb.from("scavenger_completions").delete().eq("task_id", taskId).eq("guest_id", guestId);
-    } else {
-      await sb.from("scavenger_completions").upsert({ task_id: taskId, guest_id: guestId });
-    }
-  };
-
   const score = questions
     ? questions.filter((q) => myAnswers[q.id]?.is_correct === true).length
     : 0;
-
-  const TABS: { key: Tab; label: string }[] = [
-    { key: "quiz", label: "Mr & Mrs" },
-    { key: "hunt", label: "Scavenger" },
-  ];
 
   return (
     <PageFrame
@@ -116,29 +81,7 @@ export default function GamesPage() {
       title="The Salon"
       subtitle="How well do you really know her?"
     >
-      <div className="grid grid-cols-2 gap-0 border-y mb-8" style={{ borderColor: "var(--color-rule)" }}>
-        {TABS.map((t, i) => (
-          <button
-            key={t.key}
-            type="button"
-            onClick={() => setTab(t.key)}
-            className={`label text-[9px] py-3.5 ${i > 0 ? "border-l" : ""}`}
-            style={{
-              borderColor: "var(--color-rule)",
-              background: tab === t.key ? "var(--color-navy)" : "transparent",
-              color: tab === t.key ? "var(--color-paper)" : "var(--color-navy)",
-              minHeight: "48px",
-            }}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      {tab === "quiz" && (
-        <QuizTab questions={questions} myAnswers={myAnswers} score={score} total={questions?.length ?? 0} onAnswer={answer} />
-      )}
-      {tab === "hunt" && <HuntTab tasks={tasks} done={completions} onToggle={toggleTask} />}
+      <QuizTab questions={questions} myAnswers={myAnswers} score={score} total={questions?.length ?? 0} onAnswer={answer} />
     </PageFrame>
   );
 }
@@ -284,74 +227,6 @@ function QuizTab({
           </ol>
         </section>
       ))}
-    </>
-  );
-}
-
-function HuntTab({
-  tasks,
-  done,
-  onToggle,
-}: {
-  tasks: Task[] | null;
-  done: Set<string>;
-  onToggle: (id: string) => void;
-}) {
-  if (!tasks) return <SkeletonList n={6} h="h-14" />;
-  const completed = tasks.filter((t) => done.has(t.id)).length;
-  return (
-    <>
-      <div
-        className="border p-4 mb-6 flex items-baseline justify-between"
-        style={{ borderColor: "var(--color-rule)" }}
-      >
-        <span className="label text-[9px]" style={{ color: "var(--color-gold)" }}>
-          The Hunt
-        </span>
-        <span className="font-display" style={{ color: "var(--color-navy)", fontSize: "20px" }}>
-          {completed} / {tasks.length}
-        </span>
-      </div>
-      <ul className="space-y-2">
-        {tasks.map((t) => {
-          const isDone = done.has(t.id);
-          return (
-            <li key={t.id}>
-              <button
-                type="button"
-                onClick={() => onToggle(t.id)}
-                className="w-full text-left border p-4 flex items-center gap-4"
-                style={{
-                  background: isDone ? "var(--color-paper-warm)" : "transparent",
-                  borderColor: isDone ? "var(--color-gold)" : "var(--color-rule)",
-                  minHeight: "56px",
-                }}
-              >
-                <span
-                  className="w-5 h-5 border shrink-0 flex items-center justify-center"
-                  style={{
-                    borderColor: isDone ? "var(--color-gold)" : "var(--color-rule)",
-                    background: isDone ? "var(--color-gold)" : "transparent",
-                  }}
-                  aria-hidden
-                />
-                <span
-                  className="font-display flex-1"
-                  style={{
-                    color: "var(--color-navy)",
-                    fontSize: "16px",
-                    lineHeight: 1.3,
-                    textDecoration: isDone ? "line-through" : "none",
-                    opacity: isDone ? 0.55 : 1,
-                  }}
-                >
-                  {t.task}
-                </span>
-              </button>
-            </li>
-          );
-        })}
-      </ul>
     </>
   );
 }
