@@ -54,7 +54,7 @@ function addDismissed(id: string) {
 }
 
 function isLive(b: Broadcast): boolean {
-  if (b.kind === "mission") return false; // consumed by Mission, no takeover
+  if (b.kind === "mission") return false; // mission feature removed — ignore any stray rows
   if (b.expires_at && new Date(b.expires_at) < new Date()) return false;
   return true;
 }

@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { pickMissionForDate } from "@/lib/missions";
 import { HEN_DATE } from "@/lib/dates";
 
 type Stop = {
@@ -73,7 +72,6 @@ export function DailyBriefing() {
     };
   }, []);
 
-  const mission = pickMissionForDate(now);
   const phase = derivePhase(now, stops);
   const dateLabel = now.toLocaleDateString("en-IE", {
     weekday: "long",
@@ -113,30 +111,6 @@ export function DailyBriefing() {
             style={{ background: "var(--color-rule)", width: "0.5px" }}
           />
           <PhaseBlock phase={phase} />
-        </div>
-
-        <div className="rule mt-8" />
-
-        {/* Mission */}
-        <div className="mt-7">
-          <p
-            className="text-[10px] uppercase tracking-eyebrow font-medium"
-            style={{ color: "var(--color-gold)" }}
-          >
-            Mission of the Day
-          </p>
-          <p
-            className="font-display italic mt-3"
-            style={{
-              color: "var(--color-ink)",
-              fontSize: "clamp(22px, 5vw, 28px)",
-              lineHeight: 1.2,
-              letterSpacing: "-0.01em",
-              maxWidth: "30ch",
-            }}
-          >
-            {mission}
-          </p>
         </div>
       </div>
     </section>
@@ -306,7 +280,7 @@ function PhaseBlock({ phase }: { phase: Phase }) {
           lineHeight: 1.15,
         }}
       >
-        Develops 11 July
+        Develops 28 June
       </p>
     </div>
   );

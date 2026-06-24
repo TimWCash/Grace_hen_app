@@ -38,7 +38,6 @@ export default function AdminPage() {
   const [liveTables, setLiveTables] = useState(true); // false if 003 not run
   const [flash, setFlash] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
-  const [mission, setMission] = useState("");
   const [markVideoUrl, setMarkVideoUrl] = useState<string | null>(null);
   const [videoUploading, setVideoUploading] = useState(false);
   const videoRef = useRef<HTMLInputElement>(null);
@@ -485,30 +484,7 @@ export default function AdminPage() {
         </button>
       </Section>
 
-      {/* MISSION + NOTICE */}
-      <Section label="Mission of the Day">
-        <input
-          type="text"
-          value={mission}
-          onChange={(e) => setMission(e.target.value)}
-          placeholder="Override today's mission…"
-          className="w-full border-b py-3 bg-transparent focus:outline-none font-display"
-          style={{ borderColor: "var(--color-rule)", color: "var(--color-navy)", fontSize: "16px" }}
-        />
-        <button
-          type="button"
-          disabled={!mission.trim()}
-          onClick={async () => {
-            const ok = await broadcast("mission", { text: mission.trim() }, 60 * 24);
-            if (ok) { say("Mission updated."); setMission(""); }
-          }}
-          className="mt-3 w-full label text-[9px] py-3 border disabled:opacity-40"
-          style={{ borderColor: "var(--color-navy)", color: "var(--color-navy)", minHeight: "44px" }}
-        >
-          Set mission
-        </button>
-      </Section>
-
+      {/* NOTICE */}
       <Section label="Send a Notice">
         <input
           type="text"
