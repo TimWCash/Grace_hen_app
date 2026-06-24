@@ -12,6 +12,7 @@ type Piece = {
   delay: number; // seconds
   size: number; // px
   square: boolean;
+  face: string; // which Mark photo (mark pieces only)
 };
 
 const COLORS: Record<"gold" | "navy" | "chalk", string> = {
@@ -19,6 +20,18 @@ const COLORS: Record<"gold" | "navy" | "chalk", string> = {
   navy: "#002344",
   chalk: "#F5F5F5",
 };
+
+// Mark through the ages — a random one tumbles down per confetti "head".
+// Drop the photos in /public/photos/mark/ as mark-1.jpg … mark-5.jpg; any
+// that aren't there yet are simply skipped (onError), so this is safe early.
+const MARK_FACES = [
+  "/photos/mark-angel.jpg",
+  "/photos/mark/mark-1.jpg",
+  "/photos/mark/mark-2.jpg",
+  "/photos/mark/mark-3.jpg",
+  "/photos/mark/mark-4.jpg",
+  "/photos/mark/mark-5.jpg",
+];
 
 let _seq = 0;
 
@@ -38,6 +51,7 @@ function buildPieces(): Piece[] {
       delay: r(0, 0.45),
       size: isMark ? r(30, 46) : r(7, 14),
       square: Math.random() < 0.5,
+      face: pick(MARK_FACES),
     };
   });
 }
@@ -84,11 +98,16 @@ export function Celebration() {
           {p.kind === "mark" ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src="/photos/mark-angel.jpg"
+              src={p.face}
               alt=""
               className="w-full h-full object-cover rounded-full"
-              style={{ objectPosition: "center 22%", border: "1px solid #C5A059" }}
+              style={{ objectPosition: "center 25%", border: "1px solid #C5A059" }}
               draggable={false}
+              onError={(e) => {
+                // Photo not added yet → hide this head rather than show a broken tile.
+                const span = e.currentTarget.parentElement;
+                if (span) span.style.display = "none";
+              }}
             />
           ) : (
             <span
