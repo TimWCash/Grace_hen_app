@@ -36,6 +36,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
   icons: {
     icon: EVENT.brand.icon,
+    apple: "/apple-touch-icon.png",
   },
 };
 
