@@ -58,6 +58,8 @@ export default function AdminPage() {
   const [liveTables, setLiveTables] = useState(true); // false if 003 not run
   const [flash, setFlash] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
+  const [pushResult, setPushResult] = useState<string | null>(null);
+  const [pushing, setPushing] = useState(false);
   const [markVideoUrl, setMarkVideoUrl] = useState<string | null>(BUNDLED_MARK_VIDEO);
   const [videoUploading, setVideoUploading] = useState(false);
   const videoRef = useRef<HTMLInputElement>(null);
@@ -159,6 +161,42 @@ export default function AdminPage() {
       /* push is best-effort; the in-app alert still fires */
     }
     return true;
+  };
+
+  const sendTestPush = async () => {
+    setPushing(true);
+    setPushResult(null);
+    try {
+      const { data: { session } } = await supabase().auth.getSession();
+      const res = await fetch("/api/push", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.access_token ?? ""}`,
+        },
+        body: JSON.stringify({
+          title: "Test alert 🔔",
+          body: "If you can see this, push notifications work!",
+          url: "/tonight",
+        }),
+      });
+      const j = await res.json().catch(() => ({}));
+      if (!res.ok || !j.ok) {
+        setPushResult(
+          j.error?.includes("VAPID")
+            ? "Server key not set yet — add VAPID_PRIVATE_KEY in Vercel + redeploy."
+            : `Error: ${j.error ?? res.status}`,
+        );
+      } else if (!j.targets) {
+        setPushResult("0 phones subscribed yet — tap “Enable alerts” + Allow on a phone first, then retry.");
+      } else {
+        setPushResult(`Sent to ${j.sent} phone${j.sent === 1 ? "" : "s"}${j.failed ? `, ${j.failed} failed` : ""}.`);
+      }
+    } catch {
+      setPushResult("Couldn’t reach the push server.");
+    } finally {
+      setPushing(false);
+    }
   };
 
   const uploadMarkVideo = async (file: File) => {
@@ -541,6 +579,33 @@ export default function AdminPage() {
         >
           Send notice
         </button>
+      </Section>
+
+      <Section label="Test Notifications">
+        <p
+          className="font-display italic"
+          style={{ color: "var(--color-navy)", opacity: 0.7, fontSize: "13px", lineHeight: 1.4 }}
+        >
+          Fires a real push to every phone that has turned alerts on. Lock your
+          phone first to check it buzzes through.
+        </p>
+        <button
+          type="button"
+          disabled={pushing}
+          onClick={sendTestPush}
+          className="mt-3 w-full label text-[9px] py-3 border disabled:opacity-40"
+          style={{ borderColor: "var(--color-navy)", color: "var(--color-navy)", minHeight: "44px" }}
+        >
+          {pushing ? "Sending…" : "Send a test push"}
+        </button>
+        {pushResult && (
+          <p
+            className="font-display italic text-center mt-3"
+            style={{ color: "var(--color-gold)", fontSize: "14px", lineHeight: 1.4 }}
+          >
+            {pushResult}
+          </p>
+        )}
       </Section>
 
       {/* DEVELOP PHOTOS */}
