@@ -67,20 +67,32 @@ function isLive(b: Broadcast): boolean {
 export function BroadcastListener() {
   const [active, setActive] = useState<Broadcast | null>(null);
   const dismissedRef = useRef<string[]>([]);
+  const lastIdRef = useRef<string | null>(null);
 
-  const consider = useCallback((b: Broadcast) => {
-    if (!isLive(b)) return;
-    if (dismissedRef.current.includes(b.id)) return;
-    setActive(b);
-  }, []);
+  // One path for "here's the latest broadcast" from every source.
+  // "initial" = silent catch-up on open; poll/realtime may buzz/chime.
+  const handleLatest = useCallback(
+    (b: Broadcast, source: "initial" | "poll" | "realtime") => {
+      if (b.kind === "mission") return;
+      if (!isLive(b)) return;
+      if (b.id === lastIdRef.current) return; // already handled this one
+      lastIdRef.current = b.id;
+      if (dismissedRef.current.includes(b.id)) return; // dismissed — don't reshow/alert
+      if (source !== "initial") {
+        const [title, body] = alertTextFor(b);
+        if (title) fireAlert(title, body);
+      }
+      setActive(b);
+    },
+    [],
+  );
 
   useEffect(() => {
     dismissedRef.current = getDismissed();
     const sb = supabase();
     let cancelled = false;
 
-    // Catch a live broadcast sent while the app was closed.
-    const load = async () => {
+    const load = async (source: "initial" | "poll") => {
       const { data, error } = await sb
         .from("broadcasts")
         .select("*")
@@ -88,32 +100,37 @@ export function BroadcastListener() {
         .order("created_at", { ascending: false })
         .limit(1);
       if (cancelled || error || !data?.length) return;
-      consider(data[0] as Broadcast);
+      handleLatest(data[0] as Broadcast, source);
     };
-    load();
+    load("initial");
 
+    // Poll every 5s as the reliable path — mobile realtime websockets are
+    // flaky, so the "time to move" alerts must not depend on them.
+    const poll = setInterval(() => load("poll"), 5000);
+
+    // And re-check the instant the app returns to the foreground.
+    const onVisible = () => {
+      if (document.visibilityState === "visible") load("poll");
+    };
+    document.addEventListener("visibilitychange", onVisible);
+
+    // Realtime too — instant when it happens to work.
     const channel = sb
       .channel("broadcast-takeover")
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "broadcasts" },
-        (payload) => {
-          const b = payload.new as Broadcast;
-          // Real-time arrival → buzz/chime/notify (not on the catch-up load).
-          if (b.kind !== "mission" && !dismissedRef.current.includes(b.id)) {
-            const [title, body] = alertTextFor(b);
-            if (title) fireAlert(title, body);
-          }
-          consider(b);
-        },
+        (payload) => handleLatest(payload.new as Broadcast, "realtime"),
       )
       .subscribe();
 
     return () => {
       cancelled = true;
+      clearInterval(poll);
+      document.removeEventListener("visibilitychange", onVisible);
       sb.removeChannel(channel);
     };
-  }, [consider]);
+  }, [handleLatest]);
 
   if (!active) return null;
 
