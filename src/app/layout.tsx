@@ -7,6 +7,7 @@ import { LiveTonightBanner } from "@/components/LiveTonightBanner";
 import { NightModeProvider } from "@/components/NightMode";
 import { BroadcastListener } from "@/components/BroadcastListener";
 import { InstallGuide } from "@/components/InstallGuide";
+import { AlertsPrompt } from "@/components/AlertsPrompt";
 import { MemoryPrompt } from "@/components/MemoryPrompt";
 import { Celebration } from "@/components/Celebration";
 import { EVENT } from "@/config/event";
@@ -64,6 +65,7 @@ export default function RootLayout({
             <LiveTonightBanner />
             <main className="flex-1 pb-28">{children}</main>
             <InstallGuide />
+            <AlertsPrompt />
             <MemoryPrompt />
             <Celebration />
             <Nav />

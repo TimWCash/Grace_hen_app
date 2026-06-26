@@ -4,16 +4,23 @@ import { useEffect, useState } from "react";
 import { MemoryComposer } from "@/components/MemoryComposer";
 import { getCurrentGuest } from "@/lib/guest";
 import { guestHasMemory } from "@/lib/memories";
+import { notificationsGranted } from "@/lib/alerts";
+import { pushSupported } from "@/lib/push";
 
 const SNOOZE_KEY = "memory-prompt-snoozed"; // sessionStorage — clears on next app open
-const INSTALL_SNOOZE = "install-snoozed"; // the install guide's session-snooze flag
-const INSTALL_DONE_EVENT = "install-flow-done"; // fired when the install guide steps aside
+const ALERTS_SNOOZE = "alerts-snoozed"; // the alerts prompt's session-snooze flag
+const ALERTS_DONE_EVENT = "alerts-flow-done"; // fired when the alerts prompt steps aside
+
+function alertsResolved(): boolean {
+  if (typeof window === "undefined") return true;
+  return !pushSupported() || notificationsGranted() || !!sessionStorage.getItem(ALERTS_SNOOZE);
+}
 
 /**
  * On app open, ask each hen for her favourite Grace story (voice or text).
  * Shows until she's left one; "Maybe later" snoozes for the session.
  * Reads the guest directly (not via context) so it's safe on public routes.
- * Waits for the install guide to resolve so the two popups never stack.
+ * Last in the popup chain: install guide → alerts prompt → this.
  */
 export function MemoryPrompt() {
   const [open, setOpen] = useState(false);
@@ -38,11 +45,8 @@ export function MemoryPrompt() {
       }, 1200);
     };
 
-    const installed =
-      window.matchMedia?.("(display-mode: standalone)").matches ||
-      (window.navigator as unknown as { standalone?: boolean }).standalone === true;
-    // Go ahead if the install guide isn't going to show; otherwise wait for it.
-    if (installed || sessionStorage.getItem(INSTALL_SNOOZE)) {
+    // Go ahead if the alerts prompt isn't going to show; otherwise wait for it.
+    if (alertsResolved()) {
       runCheck();
       return () => {
         cancelled = true;
@@ -51,14 +55,14 @@ export function MemoryPrompt() {
     }
 
     const onDone = () => {
-      window.removeEventListener(INSTALL_DONE_EVENT, onDone);
+      window.removeEventListener(ALERTS_DONE_EVENT, onDone);
       if (!cancelled) runCheck();
     };
-    window.addEventListener(INSTALL_DONE_EVENT, onDone);
+    window.addEventListener(ALERTS_DONE_EVENT, onDone);
     return () => {
       cancelled = true;
       if (timer) clearTimeout(timer);
-      window.removeEventListener(INSTALL_DONE_EVENT, onDone);
+      window.removeEventListener(ALERTS_DONE_EVENT, onDone);
     };
   }, []);
 
