@@ -45,6 +45,16 @@ export async function primeAlerts(): Promise<void> {
   } catch {
     /* ignore */
   }
+  // Subscribe to web push so a closed/locked phone still gets the alerts.
+  try {
+    if ("serviceWorker" in navigator) {
+      await navigator.serviceWorker.register("/sw.js").catch(() => {});
+    }
+    const { ensurePushSubscription } = await import("@/lib/push");
+    await ensurePushSubscription();
+  } catch {
+    /* ignore */
+  }
   localStorage.setItem(ENABLED_KEY, "1");
 }
 

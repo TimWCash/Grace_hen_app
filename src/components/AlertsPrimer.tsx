@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { alertsEnabled, primeAlerts } from "@/lib/alerts";
+import { alertsEnabled, notificationsGranted, primeAlerts } from "@/lib/alerts";
+import { ensurePushSubscription } from "@/lib/push";
 
 /**
  * One-tap "Enable alerts" — unlocks audio + asks for notifications so the
@@ -13,6 +14,11 @@ export function AlertsPrimer() {
 
   useEffect(() => {
     setEnabled(alertsEnabled());
+    // If they already allowed notifications, make sure this device is
+    // subscribed for push (e.g. after this update) — silent, no prompt.
+    if (notificationsGranted()) {
+      void ensurePushSubscription();
+    }
   }, []);
 
   if (enabled) return null;

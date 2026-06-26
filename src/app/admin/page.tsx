@@ -10,6 +10,24 @@ const MARK_VIDEO_PATH = "mark/message.mp4";
 // Mark's video ships with the app, so Fiona can send it with one tap (no upload).
 const BUNDLED_MARK_VIDEO = "/videos/mark.mp4";
 
+// Notification title/body/url for a broadcast — used for closed-phone web push.
+function pushTextFor(kind: string, payload: Record<string, unknown>): [string, string, string] {
+  const venue = typeof payload.venue === "string" ? payload.venue : "";
+  const message = typeof payload.message === "string" ? payload.message : "";
+  switch (kind) {
+    case "go":
+      return ["Time to move! 🥂", message || (venue ? `Next stop: ${venue}` : "On to the next one"), "/tonight"];
+    case "warning":
+      return ["15 minutes ⏳", venue ? `Order up — we move to ${venue} soon` : "Order your drink — we move soon", "/tonight"];
+    case "notice":
+      return ["Grace's Hen", message || "Tap to open", "/tonight"];
+    case "video":
+      return ["A message from Mark 🎬", "Tap to watch", "/tonight"];
+    default:
+      return ["Grace's Hen", "Tap to open", "/tonight"];
+  }
+}
+
 type Stop = {
   id: string;
   position: number;
@@ -124,6 +142,21 @@ export default function AdminPage() {
           : `Error: ${error.message}`,
       );
       return false;
+    }
+    // Also fire a web push so closed/locked phones get it.
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      const [title, body, url] = pushTextFor(kind, payload as Record<string, unknown>);
+      await fetch("/api/push", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.access_token ?? ""}`,
+        },
+        body: JSON.stringify({ title, body, url }),
+      });
+    } catch {
+      /* push is best-effort; the in-app alert still fires */
     }
     return true;
   };
