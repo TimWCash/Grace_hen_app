@@ -7,6 +7,8 @@ import { useGuest } from "@/components/GuestProvider";
 import { supabase } from "@/lib/supabase";
 
 const MARK_VIDEO_PATH = "mark/message.mp4";
+// Mark's video ships with the app, so Fiona can send it with one tap (no upload).
+const BUNDLED_MARK_VIDEO = "/videos/mark.mp4";
 
 type Stop = {
   id: string;
@@ -38,7 +40,7 @@ export default function AdminPage() {
   const [liveTables, setLiveTables] = useState(true); // false if 003 not run
   const [flash, setFlash] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
-  const [markVideoUrl, setMarkVideoUrl] = useState<string | null>(null);
+  const [markVideoUrl, setMarkVideoUrl] = useState<string | null>(BUNDLED_MARK_VIDEO);
   const [videoUploading, setVideoUploading] = useState(false);
   const videoRef = useRef<HTMLInputElement>(null);
 
